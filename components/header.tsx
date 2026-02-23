@@ -28,18 +28,17 @@ const Header = () => {
         </Link>
         <div className='flex items-center gap-2'>
           <SignedIn>
-            <Link href={"/dashboard"} className='hidden md:block'>
+            <Link href={"/dashboard"}>
               <Button variant={"ghost"} size="sm">
                 <LayoutDashboard className='h-4 w-4 mr-1.5' />
-                Dashboard
+                <span className="hidden md:inline">Dashboard</span>
               </Button>
             </Link>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm">
-                  <span className='hidden md:inline'>Tools</span>
-                  <span className='md:hidden'>Menu</span>
+                  <span>Tools</span>
                   <ChevronDown className='h-3.5 w-3.5 ml-1' />
                 </Button>
               </DropdownMenuTrigger>
