@@ -74,8 +74,22 @@ export async function analyzeVoiceInterview(
         text = text.replace(/```json/gi, "").replace(/```/g, "").trim();
         console.log("Cleaned Text:", text);
 
-        const metrics = JSON.parse(text);
-        console.log("Parsed Metrics:", metrics);
+        let metrics;
+        try {
+            metrics = JSON.parse(text);
+            console.log("Parsed Metrics:", metrics);
+        } catch (parseError) {
+            console.error("Failed to parse Gemini JSON:", parseError);
+            console.log("Falling back to default metrics due to JSON parse error.");
+            metrics = {
+                technicalScore: 0,
+                communicationScore: 0,
+                confidenceScore: 0,
+                strengths: ["Failed to generate specific strengths."],
+                improvements: ["Failed to generate specific improvements."],
+                keyPoints: ["Could not parse the AI response."]
+            };
+        }
 
         const voiceInterview = await db.voiceInterview.create({
             data: {
@@ -85,12 +99,12 @@ export async function analyzeVoiceInterview(
                 transcript,
                 chatHistory: chatHistory as unknown as Prisma.InputJsonValue[],
                 status: "COMPLETED",
-                technicalScore: parseFloat(metrics.technicalScore) || 0,
-                communicationScore: parseFloat(metrics.communicationScore) || 0,
-                confidenceScore: parseFloat(metrics.confidenceScore) || 0,
-                strengths: Array.isArray(metrics.strengths) ? metrics.strengths : [],
-                improvements: Array.isArray(metrics.improvements) ? metrics.improvements : [],
-                keyPoints: Array.isArray(metrics.keyPoints) ? metrics.keyPoints : [],
+                technicalScore: parseFloat(metrics?.technicalScore) || 50,
+                communicationScore: parseFloat(metrics?.communicationScore) || 50,
+                confidenceScore: parseFloat(metrics?.confidenceScore) || 50,
+                strengths: Array.isArray(metrics?.strengths) ? metrics.strengths : ["Failed to generate specific strengths."],
+                improvements: Array.isArray(metrics?.improvements) ? metrics.improvements : ["Failed to generate specific improvements."],
+                keyPoints: Array.isArray(metrics?.keyPoints) ? metrics.keyPoints : ["Could not parse the AI response."],
                 detailedFeedback: "See bullet points."
             }
         });

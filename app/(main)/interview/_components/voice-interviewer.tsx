@@ -80,6 +80,9 @@ const VoiceInterviewer: React.FC<VoiceInterviewerProps> = ({ targetRole, languag
             setIsAgentSpeaking(false);
             setLoading(true); // analyze transcript
             try {
+                // Give Vapi's final transcript web-socket event a moment to flush to state
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
                 const { analyzeVoiceInterview } = await import('@/actions/analyzeVoiceInterview');
                 const interviewId = await analyzeVoiceInterview(
                     activeTranscriptRef.current,
@@ -125,7 +128,7 @@ const VoiceInterviewer: React.FC<VoiceInterviewerProps> = ({ targetRole, languag
 
             await vapi.start(process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID || "", overrides.assistantOverrides as any);
             setIsCalling(true);
-            setTimeLeft(300); // Reset timer to 5 minutes
+            setTimeLeft(300); // 5 minutes in seconds
         } catch (e) {
             console.error(e);
         } finally {
