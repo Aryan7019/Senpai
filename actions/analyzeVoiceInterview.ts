@@ -48,9 +48,9 @@ export async function analyzeVoiceInterview(
     "technicalScore": <number between 0 and 100 representing technical knowledge demonstrated>,
     "communicationScore": <number between 0 and 100 representing clarity and professional communication>,
     "confidenceScore": <number between 0 and 100 representing confidence and assertiveness>,
-    "strengths": ["<string: positives of the interviewee>", ... max 5],
-    "improvements": ["<string: improvements to be made>", ... max 5],
-    "keyPoints": ["<string: key points about what happened in the interview>", ... max 5]
+    "strengths": ["<string: positives of the interviewee>", ... max 3],
+    "improvements": ["<string: improvements to be made>", ... max 3],
+    "keyPoints": ["<string: key points about what happened in the interview>", ... max 3]
   }
 
   IMPORTANT:
@@ -58,7 +58,7 @@ export async function analyzeVoiceInterview(
   - "improvements": Focus exclusively on the improvements to be made by the interviewee.
   - "keyPoints": Focus exclusively on key points summarizing what actually happened in the interview.
   - All three arrays must contain extremely concise strings (1 short sentence max each).
-  - Provide exactly 3 to 5 bullet points for each array.
+  - Provide exactly 2 to 3 bullet points for each array.
 
   Transcript:
   ${transcript}
