@@ -47,3 +47,6 @@ next-env.d.ts
 
 # Kiro Editor
 /.kiro/
+
+# VS Code settings
+.vscode/
