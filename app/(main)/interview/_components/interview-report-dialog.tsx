@@ -3,7 +3,7 @@
 import React from "react";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Sparkles, X, Target, MessageSquare, ShieldCheck, Activity } from "lucide-react";
+import { Sparkles, X, Target, MessageSquare, ShieldCheck, Activity, CheckCircle2, ArrowUpRight, Lightbulb } from "lucide-react";
 
 interface InterviewReportDialogProps {
     open: boolean;
@@ -101,28 +101,72 @@ export function InterviewReportDialog({ open, onOpenChange, interview }: Intervi
                         </div>
                     </div>
 
-                    {/* Detailed AI Feedback Box */}
-                    <div className="relative p-8 md:p-10 rounded-[2rem] bg-[#0a0a0a] border border-white/5 overflow-hidden group">
-                        {/* Decorative background effects for feedback box */}
-                        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:2rem_2rem] opacity-30" />
-                        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-
-                        <div className="relative z-10">
-                            <div className="flex items-center gap-3 mb-8 pb-6 border-b border-white/5">
-                                <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-white">
-                                    <Activity className="h-5 w-5" />
+                    {/* Detailed AI Feedback Box (Replaced with 3 structured lists) */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Strengths */}
+                        <div className="relative p-6 rounded-[2rem] bg-gradient-to-b from-emerald-500/5 to-transparent border border-emerald-500/10 overflow-hidden group hover:border-emerald-500/30 transition-all">
+                            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
+                                <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
+                                    <CheckCircle2 className="h-5 w-5" />
                                 </div>
-                                <div>
-                                    <h3 className="text-xl font-bold text-white tracking-tight">AI Interviewer Notes</h3>
-                                    <p className="text-xs text-white/40 font-medium">Detailed feedback & areas for improvement</p>
-                                </div>
+                                <h3 className="text-lg font-bold text-white tracking-tight">Key Strengths</h3>
                             </div>
+                            <ul className="space-y-4">
+                                {Array.isArray(interview.strengths) && interview.strengths.length > 0 ? (
+                                    interview.strengths.map((point: string, i: number) => (
+                                        <li key={i} className="flex items-start gap-3 text-sm text-white/70 font-medium leading-relaxed">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0 shadow-[0_0_8px_#10b981]" />
+                                            <span>{point}</span>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <p className="text-sm text-white/30 italic">No specific strengths recorded.</p>
+                                )}
+                            </ul>
+                        </div>
 
-                            <div className="prose prose-invert max-w-none">
-                                <div className="text-[15px] leading-loosely text-white/70 whitespace-pre-wrap font-medium">
-                                    {interview.detailedFeedback}
+                        {/* Improvements */}
+                        <div className="relative p-6 rounded-[2rem] bg-gradient-to-b from-red-500/5 to-transparent border border-red-500/10 overflow-hidden group hover:border-red-500/30 transition-all">
+                            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
+                                <div className="p-2 rounded-xl bg-red-500/10 text-red-500">
+                                    <ArrowUpRight className="h-5 w-5" />
                                 </div>
+                                <h3 className="text-lg font-bold text-white tracking-tight">Areas to Improve</h3>
                             </div>
+                            <ul className="space-y-4">
+                                {Array.isArray(interview.improvements) && interview.improvements.length > 0 ? (
+                                    interview.improvements.map((point: string, i: number) => (
+                                        <li key={i} className="flex items-start gap-3 text-sm text-white/70 font-medium leading-relaxed">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0 shadow-[0_0_8px_#ef4444]" />
+                                            <span>{point}</span>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <p className="text-sm text-white/30 italic">No specific improvements recorded.</p>
+                                )}
+                            </ul>
+                        </div>
+
+                        {/* Key Points */}
+                        <div className="relative p-6 rounded-[2rem] bg-gradient-to-b from-blue-500/5 to-transparent border border-blue-500/10 overflow-hidden group hover:border-blue-500/30 transition-all">
+                            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
+                                <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500">
+                                    <Lightbulb className="h-5 w-5" />
+                                </div>
+                                <h3 className="text-lg font-bold text-white tracking-tight">Key Takeaways</h3>
+                            </div>
+                            <ul className="space-y-4">
+                                {Array.isArray(interview.keyPoints) && interview.keyPoints.length > 0 ? (
+                                    interview.keyPoints.map((point: string, i: number) => (
+                                        <li key={i} className="flex items-start gap-3 text-sm text-white/70 font-medium leading-relaxed">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0 shadow-[0_0_8px_#3b82f6]" />
+                                            <span>{point}</span>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <p className="text-sm text-white/30 italic">No key takeaways generated yet.</p>
+                                )}
+                            </ul>
                         </div>
                     </div>
 

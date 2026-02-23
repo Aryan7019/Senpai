@@ -48,8 +48,17 @@ export async function analyzeVoiceInterview(
     "technicalScore": <number between 0 and 100 representing technical knowledge demonstrated>,
     "communicationScore": <number between 0 and 100 representing clarity and professional communication>,
     "confidenceScore": <number between 0 and 100 representing confidence and assertiveness>,
-    "detailedFeedback": "<string, 3-4 paragraphs summarizing strengths, weaknesses, and a final verdict>"
+    "strengths": ["<string: positives of the interviewee>", ... max 5],
+    "improvements": ["<string: improvements to be made>", ... max 5],
+    "keyPoints": ["<string: key points about what happened in the interview>", ... max 5]
   }
+
+  IMPORTANT:
+  - "strengths": Focus exclusively on the positives of the interviewee in the interview.
+  - "improvements": Focus exclusively on the improvements to be made by the interviewee.
+  - "keyPoints": Focus exclusively on key points summarizing what actually happened in the interview.
+  - All three arrays must contain extremely concise strings (1 short sentence max each).
+  - Provide exactly 3 to 5 bullet points for each array.
 
   Transcript:
   ${transcript}
@@ -79,7 +88,10 @@ export async function analyzeVoiceInterview(
                 technicalScore: parseFloat(metrics.technicalScore) || 0,
                 communicationScore: parseFloat(metrics.communicationScore) || 0,
                 confidenceScore: parseFloat(metrics.confidenceScore) || 0,
-                detailedFeedback: metrics.detailedFeedback || "No detailed feedback generated."
+                strengths: Array.isArray(metrics.strengths) ? metrics.strengths : [],
+                improvements: Array.isArray(metrics.improvements) ? metrics.improvements : [],
+                keyPoints: Array.isArray(metrics.keyPoints) ? metrics.keyPoints : [],
+                detailedFeedback: "See bullet points."
             }
         });
 

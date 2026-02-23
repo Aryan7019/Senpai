@@ -58,6 +58,9 @@ model VoiceInterview {
   communicationScore Float?
   confidenceScore    Float?
   detailedFeedback   String?   @db.Text
+  strengths          Json[]    @default([])
+  improvements       Json[]    @default([])
+  keyPoints          Json[]    @default([])
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
