@@ -53,10 +53,11 @@ export async function analyzeVoiceInterview(
     "keyPoints": ["<string: key points about what happened in the interview>", ... max 3]
   }
 
-  IMPORTANT:
-  - "strengths": Focus exclusively on the positives of the interviewee in the interview.
-  - "improvements": Focus exclusively on the improvements to be made by the interviewee.
-  - "keyPoints": Focus exclusively on key points summarizing what actually happened in the interview.
+  IMPORTANT INSTRUCTIONS:
+  - Deeply analyze the entire transcript without bias before generating your feedback.
+  - "strengths": Focus exclusively on the positives of the interviewee based on your deep analysis.
+  - "improvements": Focus exclusively on the actionable improvements the interviewee must make.
+  - "keyPoints": Briefly summarize the most vital topics that were covered or happened in the interview.
   - All three arrays must contain extremely concise strings (1 short sentence max each).
   - Provide exactly 2 to 3 bullet points for each array.
 
