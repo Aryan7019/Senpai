@@ -1,4 +1,4 @@
-import { BrainCircuit, Briefcase, LineChart, ScrollText, LucideIcon } from "lucide-react";
+import { Briefcase, ScrollText, LineChart, Video } from "lucide-react";
 
 interface Feature {
   icon: React.ReactNode;
@@ -8,26 +8,27 @@ interface Feature {
 
 export const features: Feature[] = [
   {
-    icon: <BrainCircuit />,
-    title: "AI-Powered Career Guidance",
+    icon: <ScrollText />,
+    title: "Resume & Cover Letter Builder",
     description:
-      "Get personalized career advice and insights powered by advanced AI technology.",
+      "Build ATS-optimized resumes and generate tailored cover letters with AI. Edit in markdown, improve with AI, and export as PDF.",
   },
   {
     icon: <Briefcase />,
-    title: "Interview Preparation",
+    title: "AI Mock Interviews",
     description:
-      "Practice with role-specific questions and get instant feedback to improve your performance.",
+      "Simulate real job interviews with AI-powered voice conversations. Receive detailed analysis on communication, confidence, and technical depth.",
+  },
+  {
+    icon: <Video />,
+    title: "AI Video Course Generator",
+    description:
+      "Generate full video courses on any topic with AI narration, auto-captions, and an interactive chapter-based player.",
   },
   {
     icon: <LineChart />,
-    title: "Industry Insights",
+    title: "Industry Insights Dashboard",
     description:
-      "Stay ahead with real-time industry trends, salary data, and market analysis.",
-  },
-  {
-    icon: <ScrollText />,
-    title: "Smart Resume Creation",
-    description: "Generate ATS-optimized resumes with AI assistance.",
+      "Stay ahead with real-time salary data, in-demand skills, market trends, and AI-generated weekly career insights tailored to your field.",
   },
 ];
