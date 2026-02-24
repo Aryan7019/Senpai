@@ -175,57 +175,61 @@ export async function calculateATSScore(content: string) {
     return { score: 0, label: "Incomplete", suggestions: ["Add more content to your resume to get an ATS score."] };
   }
 
-  const prompt = `You are a senior ATS (Applicant Tracking System) analyst who has reviewed 10,000+ resumes. Score this resume using the EXACT rubric below. Be strict and precise — most resumes score between 45-75.
+  const prompt = `You are a real-world ATS (Applicant Tracking System) scoring engine used by Fortune 500 companies. Evaluate this resume the way an actual ATS + human recruiter would — with nuanced, partial-credit scoring. Consider quality, depth, and relevance, not just presence/absence.
 
-Resume:
+Resume to analyze:
 """
 ${content}
 """
 
-SCORING RUBRIC (total 100 points):
+SCORING RUBRIC (100 points total). Award partial credit based on quality:
 
-1. CONTACT INFORMATION (10 points)
-   - Full name present: 3 pts
-   - Email present: 3 pts  
-   - Phone present: 2 pts
-   - LinkedIn/portfolio link: 2 pts
+1. CONTACT_INFO (max 10):
+   - Name: 0-3 pts (3=clearly formatted full name, 1=only first name, 0=missing)
+   - Email: 0-3 pts (3=professional email, 1=unprofessional like coolguy@, 0=missing)
+   - Phone: 0-2 pts (2=properly formatted, 1=present but poorly formatted, 0=missing)
+   - LinkedIn/Portfolio: 0-2 pts (2=clickable profile link, 1=partial URL, 0=missing)
 
-2. PROFESSIONAL SUMMARY (15 points)
-   - Has a summary section: 5 pts
-   - Contains industry keywords: 5 pts
-   - Concise (2-4 sentences): 3 pts
-   - Mentions years of experience or key expertise: 2 pts
+2. SUMMARY (max 15):
+   - Presence & quality: 0-5 pts (5=compelling & tailored, 3=generic but present, 1=single vague line, 0=missing)
+   - Industry keywords: 0-5 pts (5=rich with relevant terms, 3=some keywords, 1=very generic, 0=none)
+   - Length & clarity: 0-3 pts (3=concise 2-4 sentences, 2=slightly long/short, 0=missing/rambling)
+   - Specificity: 0-2 pts (2=mentions specific expertise/years, 1=vague mention, 0=nothing specific)
 
-3. SKILLS SECTION (10 points)
-   - Has a skills section: 4 pts
-   - Lists 5+ relevant skills: 3 pts
-   - Mix of hard and soft skills: 3 pts
+3. SKILLS (max 10):
+   - Has skills section: 0-4 pts (4=well-organized, 2=exists but messy, 0=missing)
+   - Skill count & relevance: 0-3 pts (3=5+ relevant skills, 2=3-4 skills, 1=1-2 skills, 0=none)
+   - Variety: 0-3 pts (3=good mix of technical+soft, 2=mostly one type, 0=none)
 
-4. WORK EXPERIENCE (25 points)
-   - Has experience entries with dates: 8 pts
-   - Uses action verbs (Led, Built, Designed, etc.): 5 pts
-   - Includes quantified results (%, $, numbers): 7 pts
-   - Shows career progression: 5 pts
+4. EXPERIENCE (max 25):
+   - Entries with dates: 0-8 pts (8=multiple well-structured entries, 5=1-2 entries, 2=entries without dates, 0=missing)
+   - Action verbs: 0-5 pts (5=strong verbs throughout, 3=some action verbs, 1=mostly passive, 0=no descriptions)
+   - Quantified results: 0-7 pts (7=metrics in most bullets, 4=some numbers, 2=vague achievements, 0=no metrics)
+   - Career progression: 0-5 pts (5=clear growth shown, 3=lateral moves, 1=single position, 0=no experience)
 
-5. EDUCATION (10 points)
-   - Has education section: 5 pts
-   - Includes degree, institution, dates: 5 pts
+5. EDUCATION (max 10):
+   - Presence: 0-5 pts (5=complete with degree+school+year, 3=partial info, 1=just school name, 0=missing)
+   - Detail: 0-5 pts (5=GPA/honors/relevant coursework, 3=basic info complete, 1=minimal, 0=missing)
 
-6. FORMATTING & STRUCTURE (15 points)
-   - Clear section headings: 5 pts
-   - Consistent formatting: 5 pts
-   - Appropriate length (not too short/long): 5 pts
+6. STRUCTURE (max 15):
+   - Section headings: 0-5 pts (5=clear standard headings, 3=some headings, 1=disorganized, 0=no structure)
+   - Consistency: 0-5 pts (5=uniform formatting, 3=mostly consistent, 1=mixed styles, 0=chaotic)
+   - Length: 0-5 pts (5=appropriate density, 3=slightly long/short, 1=way too brief, 0=nearly empty)
 
-7. KEYWORD OPTIMIZATION (15 points)
-   - Industry-relevant terminology: 5 pts
-   - Role-specific keywords: 5 pts
-   - Technical tools/technologies mentioned: 5 pts
+7. KEYWORDS (max 15):
+   - Industry terms: 0-5 pts (5=strong industry language, 3=some terms, 1=very generic, 0=none)
+   - Role-specific terms: 0-5 pts (5=clear role alignment, 3=partial, 1=vague, 0=none)
+   - Tools & technologies: 0-5 pts (5=specific tools named, 3=some mentioned, 1=vague references, 0=none)
 
-Score each category, sum the total. Return ONLY this JSON (no markdown):
-{"score": <total 0-100>, "label": "<label>", "suggestions": ["<tip1>", "<tip2>", "<tip3>"]}
+Score each category with partial credit based on QUALITY. Return this EXACT JSON (no markdown):
+{"breakdown":{"contact":0,"summary":0,"skills":0,"experience":0,"education":0,"structure":0,"keywords":0},"score":0,"label":"","suggestions":["","",""]}
 
-Labels: 80-100 = "Excellent", 60-79 = "Good", 40-59 = "Needs Work", 0-39 = "Poor"
-Give exactly 3 specific, actionable tips targeting the weakest categories. Return ONLY the JSON.`;
+Rules:
+- "score" MUST equal the exact sum of breakdown values
+- Labels: 80-100="Excellent", 60-79="Good", 40-59="Needs Work", 0-39="Poor"
+- 3 specific tips targeting the lowest-scoring categories
+- Return ONLY the JSON`;
+
 
   try {
     const result = await model.generateContent(prompt);

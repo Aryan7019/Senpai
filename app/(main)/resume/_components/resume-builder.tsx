@@ -1,6 +1,6 @@
 "use client"
 import { Button } from '@/components/ui/button'
-import { Download, Loader2, Save, ChevronDown, ChevronRight } from 'lucide-react'
+import { Download, Loader2, Save, ChevronDown, ChevronRight, Eye, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -18,6 +18,7 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
     const [isGenerating, setIsGenerating] = useState(false)
     const [isMounted, setIsMounted] = useState(false)
     const [previewContent, setPreviewContent] = useState(initialContent || "")
+    const [showMobilePreview, setShowMobilePreview] = useState(false)
     const { user } = useUser();
 
     const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -294,10 +295,40 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
 
                 {/* Mobile bottom bar */}
                 <div className="sticky bottom-0 left-0 right-0 p-4 bg-background border-t border-border lg:hidden z-10">
-                    <Button onClick={generatePDF} disabled={isGenerating} className="w-full gradient text-primary-foreground font-bold">
-                        {isGenerating ? <><Loader2 className='h-4 w-4 animate-spin' /> Generating...</> : <><Download className='h-4 w-4' /> Download Resume</>}
-                    </Button>
+                    <div className="flex gap-2">
+                        <Button onClick={() => setShowMobilePreview(true)} variant="outline" className="border-primary/30 text-primary">
+                            <Eye className='h-4 w-4' /> Preview
+                        </Button>
+                        <Button onClick={generatePDF} disabled={isGenerating} className="flex-1 gradient text-primary-foreground font-bold">
+                            {isGenerating ? <><Loader2 className='h-4 w-4 animate-spin' /> Generating...</> : <><Download className='h-4 w-4' /> Download PDF</>}
+                        </Button>
+                    </div>
                 </div>
+
+                {/* Mobile preview overlay */}
+                {showMobilePreview && (
+                    <div className="fixed inset-0 z-50 bg-background lg:hidden flex flex-col">
+                        <div className="flex items-center justify-between p-4 border-b border-border">
+                            <h2 className="font-bold text-foreground">Resume Preview</h2>
+                            <div className="flex items-center gap-3">
+                                <ATSScore content={previewContent} />
+                                <button onClick={() => setShowMobilePreview(false)} className="w-8 h-8 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground">
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="flex-1 overflow-auto p-4 bg-secondary flex justify-center">
+                            <div className="origin-top" style={{ transform: 'scale(0.45)' }}>
+                                <ResumePreview content={previewContent} />
+                            </div>
+                        </div>
+                        <div className="p-4 border-t border-border bg-background">
+                            <Button onClick={() => { setShowMobilePreview(false); generatePDF(); }} disabled={isGenerating} className="w-full gradient text-primary-foreground font-bold">
+                                {isGenerating ? <><Loader2 className='h-4 w-4 animate-spin' /> Generating...</> : <><Download className='h-4 w-4' /> Download PDF</>}
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </section>
 
             {/* ═══════════════════════════════════════════════════ */}
