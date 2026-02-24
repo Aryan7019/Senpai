@@ -6,73 +6,73 @@ import { GoogleGenerativeAI } from "@google/generative-ai"
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash-preview-09-2025"
+  model: "gemini-2.5-flash"
 })
 export async function saveResume(content: any, formData?: any) {
-    try {
-        const { userId } = await auth();
-        if (!userId) {
-            console.error("No userId from auth");
-            throw new Error("User not authenticated");
-        }
-
-        console.log("Authenticated user:", userId);
-
-        const user = await db.user.findUnique({
-            where: {
-                clerkUserId: userId
-            }
-        });
-
-        if (!user) {
-            console.error("User not found in database for clerkUserId:", userId);
-            throw new Error("User not found");
-        }
-
-        console.log("Found user in DB:", user.id);
-
-        const updateData: any = {
-            userId: user.id,
-            content: content || ""
-        };
-
-        // Save form data as JSON string if provided
-        if (formData) {
-            try {
-                updateData.formData = JSON.stringify(formData);
-                console.log("FormData stringified, length:", updateData.formData.length);
-            } catch (jsonError: any) {
-                console.error("Error stringifying formData:", jsonError);
-                throw new Error("Invalid form data format");
-            }
-        }
-
-        console.log("Attempting upsert for userId:", user.id);
-        console.log("Content length:", content?.length || 0);
-
-        const resume = await db.resume.upsert({
-            where: {
-                userId: user.id
-            },
-            update: updateData,
-            create: updateData
-        })
-        
-        console.log("Resume saved successfully:", resume.id);
-        revalidatePath("/resume")
-        return { success: true, resume };
-    } catch (error: any) {
-        console.error("=== SAVE RESUME ERROR ===");
-        console.error("Error type:", error.constructor.name);
-        console.error("Error message:", error.message);
-        console.error("Error stack:", error.stack);
-        console.error("========================");
-        throw error;
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      console.error("No userId from auth");
+      throw new Error("User not authenticated");
     }
+
+    console.log("Authenticated user:", userId);
+
+    const user = await db.user.findUnique({
+      where: {
+        clerkUserId: userId
+      }
+    });
+
+    if (!user) {
+      console.error("User not found in database for clerkUserId:", userId);
+      throw new Error("User not found");
+    }
+
+    console.log("Found user in DB:", user.id);
+
+    const updateData: any = {
+      userId: user.id,
+      content: content || ""
+    };
+
+    // Save form data as JSON string if provided
+    if (formData) {
+      try {
+        updateData.formData = JSON.stringify(formData);
+        console.log("FormData stringified, length:", updateData.formData.length);
+      } catch (jsonError: any) {
+        console.error("Error stringifying formData:", jsonError);
+        throw new Error("Invalid form data format");
+      }
+    }
+
+    console.log("Attempting upsert for userId:", user.id);
+    console.log("Content length:", content?.length || 0);
+
+    const resume = await db.resume.upsert({
+      where: {
+        userId: user.id
+      },
+      update: updateData,
+      create: updateData
+    })
+
+    console.log("Resume saved successfully:", resume.id);
+    revalidatePath("/resume")
+    return { success: true, resume };
+  } catch (error: any) {
+    console.error("=== SAVE RESUME ERROR ===");
+    console.error("Error type:", error.constructor.name);
+    console.error("Error message:", error.message);
+    console.error("Error stack:", error.stack);
+    console.error("========================");
+    throw error;
+  }
 }
 
-export async function getResume(){
-     const { userId } = await auth();
+export async function getResume() {
+  const { userId } = await auth();
   if (!userId) throw new Error("User not authenticated");
 
   const user = await db.user.findUnique({
@@ -83,8 +83,8 @@ export async function getResume(){
 
   if (!user) throw new Error("User not found");
   return await db.resume.findUnique({
-    where:{
-        userId:user.id
+    where: {
+      userId: user.id
     }
   })
 }
@@ -100,7 +100,7 @@ export async function improveWithAi({ current, type, organization, title }: any)
   });
 
   if (!user) throw new Error("User not found");
-  
+
   const prompt = `
     As an expert resume writer and career coach, improve the following ${type} description${title ? ` for "${title}"` : ''}${organization ? ` at ${organization}` : ''}.
     
@@ -155,7 +155,7 @@ export async function improveWithAi({ current, type, organization, title }: any)
     
     **Important:** Only return the improved description text without any additional explanations or headers.
   `;
-  
+
   try {
     const result = await model.generateContent(prompt)
     const response = result.response

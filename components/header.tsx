@@ -9,7 +9,7 @@ import {
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from './ui/button'
-import { ChevronDown, FileText, GraduationCap, LayoutDashboard, PenBox } from 'lucide-react'
+import { ChevronDown, FileText, GraduationCap, LayoutDashboard, PenBox, Video } from 'lucide-react'
 import { DropdownMenuContent, DropdownMenuTrigger, DropdownMenu, DropdownMenuItem } from './ui/dropdown-menu'
 
 const Header = () => {
@@ -59,6 +59,12 @@ const Header = () => {
                   <Link href={"/interview"} className='flex items-center gap-2 cursor-pointer'>
                     <GraduationCap className='h-4 w-4' />
                     <span>Interview Prep</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href={"/courses"} className='flex items-center gap-2 cursor-pointer'>
+                    <Video className='h-4 w-4' />
+                    <span>Course Generator</span>
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>

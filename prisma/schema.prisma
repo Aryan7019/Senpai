@@ -28,7 +28,8 @@ model User {
   assessments     Assessment[]
   voiceInterviews VoiceInterview[]
   resume          Resume?
-  coverLetter   CoverLetter[]
+  coverLetter     CoverLetter[]
+  courses         Course[]
 }
 
 model Assessment {
@@ -131,4 +132,39 @@ enum MarketOutlook{
   POSITIVE
   NEUTRAL
   NEGATIVE
+}
+
+model Course {
+  id            String         @id @default(uuid())
+  courseId      String         @unique
+  name          String
+  description   String?        @db.Text
+  level         String
+  totalChapters Int
+  layout        Json           // Parsed syllabus/chapter JSON array
+  createdBy     String
+  user          User           @relation(fields: [createdBy], references: [id])
+  slides        CourseSlide[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([createdBy])
+}
+
+model CourseSlide {
+  id            String    @id @default(uuid())
+  courseId      String
+  course        Course    @relation(fields: [courseId], references: [courseId], onDelete: Cascade)
+  chapterId     String
+  slideIndex    Int
+  slideData     Json      // JSON structured slide elements (heading, bullet points, code)
+  narrationText String    @db.Text
+  audioUrl      String?   // Public URL to the generated MP3 in Supabase
+  captions      Json?     // Deepgram timestamp JSON
+  revealData    Json?     // Animation timeline mapping
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([courseId])
+  @@index([chapterId])
 }

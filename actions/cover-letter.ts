@@ -5,9 +5,9 @@ import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash-preview-09-2025"
+  model: "gemini-2.5-flash"
 })
-export async function generateCoverLetter(data:any) {
+export async function generateCoverLetter(data: any) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
@@ -18,9 +18,8 @@ export async function generateCoverLetter(data:any) {
   if (!user) throw new Error("User not found");
 
   const prompt = `
-    Write a professional cover letter for a ${data.jobTitle} position at ${
-    data.companyName
-  }.
+    Write a professional cover letter for a ${data.jobTitle} position at ${data.companyName
+    }.
     
     About the candidate:
     - Industry: ${user.industry}
@@ -59,7 +58,7 @@ export async function generateCoverLetter(data:any) {
     });
 
     return coverLetter;
-  } catch (error:any) {
+  } catch (error: any) {
     console.error("Error generating cover letter:", error.message);
     throw new Error("Failed to generate cover letter");
   }
@@ -85,7 +84,7 @@ export async function getCoverLetters() {
   });
 }
 
-export async function getCoverLetter(id:any) {
+export async function getCoverLetter(id: any) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
@@ -103,7 +102,7 @@ export async function getCoverLetter(id:any) {
   });
 }
 
-export async function deleteCoverLetter(id:any) {
+export async function deleteCoverLetter(id: any) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
