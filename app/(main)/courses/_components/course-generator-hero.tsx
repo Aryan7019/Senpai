@@ -28,20 +28,17 @@ export default function CourseGeneratorHero() {
 
             setProgress(20);
 
-            // STEP 2: Generate chapters — batch 2 at a time to avoid rate limits
+            // STEP 2: Generate chapters in batches of 2 (parallel Gemini, safe for gemma quota)
             const chapters = course.layout as any[];
             const chapterCount = chapters.length;
-            let completedChapters = 0;
+            let completed = 0;
 
-            setStatusText(`Generating ${chapterCount} chapters...`);
-
-            // Process in batches of 2 to avoid overwhelming the API
             const batchSize = 2;
             for (let i = 0; i < chapterCount; i += batchSize) {
                 const batch = chapters.slice(i, i + batchSize);
-
                 await Promise.all(
                     batch.map(async (chapter) => {
+                        setStatusText(`Generating: ${chapter.chapterTitle}...`);
                         const fetchRes = await fetch('/api/generate-video-content', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -56,10 +53,8 @@ export default function CourseGeneratorHero() {
                             const err = await fetchRes.json();
                             throw new Error(err.error || "Failed to generate chapter content");
                         }
-
-                        completedChapters++;
-                        setStatusText(`Completed: ${chapter.chapterTitle} (${completedChapters}/${chapterCount})`);
-                        setProgress(20 + (completedChapters / chapterCount) * 80);
+                        completed++;
+                        setProgress(20 + (completed / chapterCount) * 80);
                     })
                 );
             }

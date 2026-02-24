@@ -6,7 +6,34 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { v4 as uuidv4 } from 'uuid';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+const MODELS = ['gemma-3-27b-it'];
+
+async function generateWithRetry(prompt: string, maxRetries = 3): Promise<string> {
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+        for (const modelName of MODELS) {
+            try {
+                const model = genAI.getGenerativeModel({ model: modelName });
+                const result = await model.generateContent(prompt);
+                let text = result.response.text();
+                text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                return text;
+            } catch (err: any) {
+                const isRateLimit = err?.message?.includes('429') || err?.message?.includes('quota');
+                console.warn(`Model ${modelName} failed (attempt ${attempt + 1}): ${err?.message?.slice(0, 100)}`);
+
+                if (isRateLimit) {
+                    // Wait before retrying on rate limit
+                    const waitTime = Math.min(5000 * (attempt + 1), 30000);
+                    console.log(`Rate limited, waiting ${waitTime}ms before retry...`);
+                    await new Promise(r => setTimeout(r, waitTime));
+                } else {
+                    await new Promise(r => setTimeout(r, 1000));
+                }
+            }
+        }
+    }
+    throw new Error("All Gemini models failed after retries. You may have exceeded daily quota limits.");
+}
 
 export async function generateCourseLayout(topic: string, level: string = "Beginner") {
     const { userId } = await auth();
@@ -54,10 +81,7 @@ export async function generateCourseLayout(topic: string, level: string = "Begin
     `;
 
     try {
-        const result = await model.generateContent(prompt);
-        let text = result.response.text();
-        text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-
+        const text = await generateWithRetry(prompt);
         const layoutJson = JSON.parse(text);
 
         const courseId = uuidv4();
@@ -82,7 +106,6 @@ export async function generateCourseLayout(topic: string, level: string = "Begin
 
     } catch (error: any) {
         console.error("Failed to generate course layout:", error?.message || error);
-        console.error("Full error details:", JSON.stringify(error, null, 2));
         throw new Error(`Failed to generate course layout: ${error?.message || "Unknown error"}`);
     }
 }
