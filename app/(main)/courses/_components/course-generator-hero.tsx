@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 
 export default function CourseGeneratorHero() {
     const [topic, setTopic] = useState('');
+    const [level, setLevel] = useState('Beginner');
     const [isGenerating, setIsGenerating] = useState(false);
     const [progress, setProgress] = useState(0);
     const [statusText, setStatusText] = useState('');
@@ -23,7 +24,7 @@ export default function CourseGeneratorHero() {
 
         try {
             // STEP 1: Generate Layout (Fast)
-            const layoutResult = await generateCourseLayout(topic);
+            const layoutResult = await generateCourseLayout(topic, level);
             const { course, courseId } = layoutResult;
 
             setProgress(20);
@@ -93,24 +94,43 @@ export default function CourseGeneratorHero() {
             </p>
 
             {!isGenerating ? (
-                <div className="w-full max-w-xl relative mt-4 group">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 to-primary/10 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
-                    <div className="relative flex items-center bg-[#050505]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-2 shadow-2xl">
-                        <Input
-                            placeholder="e.g. Advanced Python Concurrency..."
-                            value={topic}
-                            onChange={(e) => setTopic(e.target.value)}
-                            className="flex-1 bg-transparent border-none text-white placeholder:text-white/30 text-lg px-4 h-14 focus-visible:ring-0 focus-visible:ring-offset-0"
-                            onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
-                        />
-                        <Button
-                            size="lg"
-                            onClick={handleGenerate}
-                            disabled={!topic || isGenerating}
-                            className="h-14 px-8 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-base shadow-[0_0_20px_-5px_var(--color-primary)] transition-all"
-                        >
-                            Generate <Play className="ml-2 w-4 h-4 fill-current" />
-                        </Button>
+                <div className="w-full max-w-xl space-y-4 mt-4">
+                    {/* Level selector */}
+                    <div className="flex items-center justify-center gap-3">
+                        {['Beginner', 'Intermediate', 'Advanced'].map((l) => (
+                            <button
+                                key={l}
+                                onClick={() => setLevel(l)}
+                                className={`px-5 py-2 rounded-xl text-sm font-bold transition-all duration-200 border ${level === l
+                                    ? 'bg-primary/20 border-primary/40 text-primary shadow-[0_0_15px_-5px_var(--color-primary)]'
+                                    : 'bg-white/5 border-white/10 text-white/40 hover:text-white/60 hover:border-white/20'
+                                    }`}
+                            >
+                                {l}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Topic input */}
+                    <div className="relative group">
+                        <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 to-primary/10 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
+                        <div className="relative flex items-center bg-[#050505]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-2 shadow-2xl">
+                            <Input
+                                placeholder="e.g. Advanced Python Concurrency..."
+                                value={topic}
+                                onChange={(e) => setTopic(e.target.value)}
+                                className="flex-1 bg-transparent border-none text-white placeholder:text-white/30 text-lg px-4 h-14 focus-visible:ring-0 focus-visible:ring-offset-0"
+                                onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
+                            />
+                            <Button
+                                size="lg"
+                                onClick={handleGenerate}
+                                disabled={!topic || isGenerating}
+                                className="h-14 px-8 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-base shadow-[0_0_20px_-5px_var(--color-primary)] transition-all"
+                            >
+                                Generate <Play className="ml-2 w-4 h-4 fill-current" />
+                            </Button>
+                        </div>
                     </div>
                 </div>
             ) : (
