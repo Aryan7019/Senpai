@@ -20,16 +20,23 @@ export default async function CoursePreviewPage({
         return notFound();
     }
 
-    const slides = await db.courseSlide.findMany({
-        where: { courseId: courseId },
-        orderBy: [
-            { chapterId: 'asc' },
-            { slideIndex: 'asc' }
-        ]
+    const rawSlides = await db.courseSlide.findMany({
+        where: { courseId: courseId }
+    });
+
+    // Build chapter order from layout (layout order = correct order)
+    const layoutChapters = course.layout as any[];
+    const chapterOrder = new Map(layoutChapters.map((ch: any, idx: number) => [ch.chapterId, idx]));
+
+    // Sort slides by actual chapter order, then by slideIndex
+    const slides = rawSlides.sort((a, b) => {
+        const chapterDiff = (chapterOrder.get(a.chapterId) ?? 999) - (chapterOrder.get(b.chapterId) ?? 999);
+        if (chapterDiff !== 0) return chapterDiff;
+        return a.slideIndex - b.slideIndex;
     });
 
     // Group slides by chapter for the navigator
-    const chapters = (course.layout as any[]).map((ch: any) => ({
+    const chapters = layoutChapters.map((ch: any) => ({
         chapterId: ch.chapterId,
         title: ch.chapterTitle,
         slides: slides.filter(s => s.chapterId === ch.chapterId),
