@@ -11,7 +11,7 @@ export const features: Feature[] = [
     icon: <ScrollText />,
     title: "Resume & Cover Letter Builder",
     description:
-      "Build ATS-optimized resumes and generate tailored cover letters with AI. Edit in markdown, improve with AI, and export as PDF.",
+      "Build resumes with a live ATS score, real-time side-by-side preview, and AI-powered content improvements. Generate tailored cover letters instantly.",
   },
   {
     icon: <Briefcase />,

@@ -166,3 +166,79 @@ export async function improveWithAi({ current, type, organization, title }: any)
     throw new Error("Failed to improve content");
   }
 }
+
+export async function calculateATSScore(content: string) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("User not authenticated");
+
+  if (!content || content.trim().length < 50) {
+    return { score: 0, label: "Incomplete", suggestions: ["Add more content to your resume to get an ATS score."] };
+  }
+
+  const prompt = `You are a senior ATS (Applicant Tracking System) analyst who has reviewed 10,000+ resumes. Score this resume using the EXACT rubric below. Be strict and precise — most resumes score between 45-75.
+
+Resume:
+"""
+${content}
+"""
+
+SCORING RUBRIC (total 100 points):
+
+1. CONTACT INFORMATION (10 points)
+   - Full name present: 3 pts
+   - Email present: 3 pts  
+   - Phone present: 2 pts
+   - LinkedIn/portfolio link: 2 pts
+
+2. PROFESSIONAL SUMMARY (15 points)
+   - Has a summary section: 5 pts
+   - Contains industry keywords: 5 pts
+   - Concise (2-4 sentences): 3 pts
+   - Mentions years of experience or key expertise: 2 pts
+
+3. SKILLS SECTION (10 points)
+   - Has a skills section: 4 pts
+   - Lists 5+ relevant skills: 3 pts
+   - Mix of hard and soft skills: 3 pts
+
+4. WORK EXPERIENCE (25 points)
+   - Has experience entries with dates: 8 pts
+   - Uses action verbs (Led, Built, Designed, etc.): 5 pts
+   - Includes quantified results (%, $, numbers): 7 pts
+   - Shows career progression: 5 pts
+
+5. EDUCATION (10 points)
+   - Has education section: 5 pts
+   - Includes degree, institution, dates: 5 pts
+
+6. FORMATTING & STRUCTURE (15 points)
+   - Clear section headings: 5 pts
+   - Consistent formatting: 5 pts
+   - Appropriate length (not too short/long): 5 pts
+
+7. KEYWORD OPTIMIZATION (15 points)
+   - Industry-relevant terminology: 5 pts
+   - Role-specific keywords: 5 pts
+   - Technical tools/technologies mentioned: 5 pts
+
+Score each category, sum the total. Return ONLY this JSON (no markdown):
+{"score": <total 0-100>, "label": "<label>", "suggestions": ["<tip1>", "<tip2>", "<tip3>"]}
+
+Labels: 80-100 = "Excellent", 60-79 = "Good", 40-59 = "Needs Work", 0-39 = "Poor"
+Give exactly 3 specific, actionable tips targeting the weakest categories. Return ONLY the JSON.`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    let text = result.response.text().trim();
+    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    const parsed = JSON.parse(text);
+    return {
+      score: Math.min(100, Math.max(0, Math.round(parsed.score || 0))),
+      label: parsed.label || "Unknown",
+      suggestions: parsed.suggestions || []
+    };
+  } catch (err: any) {
+    console.error("ATS score error:", err.message);
+    return { score: 0, label: "Error", suggestions: ["Could not calculate ATS score. Please try again."] };
+  }
+}

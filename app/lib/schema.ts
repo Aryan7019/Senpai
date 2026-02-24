@@ -2,38 +2,39 @@ import { Linkedin } from "lucide-react";
 import z from "zod/v3";
 
 export const onboardingSchema = z.object({
-    industry: z.string({
-        required_error: "Please select an industry"
-    }),
-    subIndustry: z.string({
-        required_error: "Please select a specialization"
-    }),
-    bio: z.string().max(500).optional(),
-    experience: z.string()
-        .transform((val) => parseInt(val, 10))
-        .pipe(
-            z.number()
-                .min(0, "Experience must be at least 0 years")
-                .max(50, "Experience cannot exceed 50 years")
-        ),
-    skills: z.string().transform((val) =>
-        val
-            ? val
-                .split(",")
-                .map((skill) => skill.trim())
-                .filter(Boolean)
-            : []
-        )
+  industry: z.string({
+    required_error: "Please select an industry"
+  }),
+  subIndustry: z.string({
+    required_error: "Please select a specialization"
+  }),
+  bio: z.string().max(500).optional(),
+  experience: z.string()
+    .transform((val) => parseInt(val, 10))
+    .pipe(
+      z.number()
+        .min(0, "Experience must be at least 0 years")
+        .max(50, "Experience cannot exceed 50 years")
+    ),
+  skills: z.string().transform((val) =>
+    val
+      ? val
+        .split(",")
+        .map((skill) => skill.trim())
+        .filter(Boolean)
+      : []
+  )
 });
 
-export const contactSchema=z.object({
-    email:z.string().email("Invalid email address"),
-    mobile:z.string().optional(),
-    linkedin:z.string().optional(),
-    github:z.string().optional(),
-    leetcode:z.string().optional(),
-    twitter:z.string().optional(),
+export const contactSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  mobile: z.string().optional(),
+  linkedin: z.string().optional(),
+  github: z.string().optional(),
+  leetcode: z.string().optional(),
+  twitter: z.string().optional(),
 })
+
 export const entrySchema = z
   .object({
     title: z.string().min(1, "Title is required"),
@@ -56,13 +57,30 @@ export const entrySchema = z
     }
   );
 
+export const certificationSchema = z.object({
+  name: z.string().min(1, "Certification name is required"),
+  organization: z.string().min(1, "Issuing organization is required"),
+  date: z.string().optional(),
+  credentialId: z.string().optional(),
+});
+
+export const publicationSchema = z.object({
+  title: z.string().min(1, "Publication title is required"),
+  publisher: z.string().min(1, "Publisher is required"),
+  date: z.string().optional(),
+  description: z.string().optional(),
+});
+
 export const resumeSchema = z.object({
   contactInfo: contactSchema,
-  summary: z.string().min(1, "Professional summary is required"),
-  skills: z.string().min(1, "Skills are required"),
+  summary: z.string().optional(),
+  skills: z.string().optional(),
   experience: z.array(entrySchema),
   education: z.array(entrySchema),
   projects: z.array(entrySchema),
+  certifications: z.array(certificationSchema).optional().default([]),
+  achievements: z.string().optional(),
+  languages: z.string().optional(),
 });
 
 export const coverLetterSchema = z.object({
