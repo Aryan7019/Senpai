@@ -21,6 +21,11 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
     const [showMobilePreview, setShowMobilePreview] = useState(false)
     const { user } = useUser();
 
+    useEffect(() => {
+        document.body.style.overflow = showMobilePreview ? 'hidden' : '';
+        return () => { document.body.style.overflow = ''; };
+    }, [showMobilePreview]);
+
     const [openSections, setOpenSections] = useState<Record<string, boolean>>({
         contact: true, summary: true, skills: false, experience: true,
         education: false, projects: false, certifications: false,
@@ -167,7 +172,7 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
             {/* ═══════════════════════════════════════════════════ */}
             {/* LEFT PANEL: Editor — scrollable                     */}
             {/* ═══════════════════════════════════════════════════ */}
-            <section className="w-full lg:w-5/12 flex flex-col border-r border-border bg-background">
+            <section className="w-full xl:w-5/12 flex flex-col border-r border-border bg-background">
                 <div className="p-6 md:p-8 space-y-8 pb-32">
                     {/* Header */}
                     <div className="flex items-center justify-between">
@@ -294,7 +299,7 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
                 </div>
 
                 {/* Mobile bottom bar */}
-                <div className="sticky bottom-0 left-0 right-0 p-4 bg-background border-t border-border lg:hidden z-10">
+                <div className="sticky bottom-0 left-0 right-0 p-4 bg-background border-t border-border xl:hidden z-10">
                     <div className="flex gap-2">
                         <Button onClick={() => setShowMobilePreview(true)} variant="outline" className="border-primary/30 text-primary">
                             <Eye className='h-4 w-4' /> Preview
@@ -307,7 +312,7 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
 
                 {/* Mobile preview overlay */}
                 {showMobilePreview && (
-                    <div className="fixed inset-0 z-50 bg-background lg:hidden flex flex-col">
+                    <div className="fixed inset-0 z-50 bg-background xl:hidden flex flex-col overflow-hidden">
                         <div className="flex items-center justify-between p-4 border-b border-border">
                             <h2 className="font-bold text-foreground">Resume Preview</h2>
                             <div className="flex items-center gap-3">
@@ -317,8 +322,8 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
                                 </button>
                             </div>
                         </div>
-                        <div className="flex-1 overflow-auto p-4 bg-secondary flex justify-center">
-                            <div className="origin-top" style={{ transform: 'scale(0.45)' }}>
+                        <div className="flex-1 overflow-hidden p-4 bg-secondary">
+                            <div>
                                 <ResumePreview content={previewContent} />
                             </div>
                         </div>
@@ -334,7 +339,7 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
             {/* ═══════════════════════════════════════════════════ */}
             {/* RIGHT PANEL: Preview — fixed with dark bg           */}
             {/* ═══════════════════════════════════════════════════ */}
-            <section className="hidden lg:block flex-1 bg-secondary">
+            <section className="hidden xl:block flex-1 bg-secondary overflow-x-hidden">
                 <div className="sticky top-0 h-screen flex flex-col items-center p-8 relative">
                     {/* Floating ATS Widget */}
                     <div className="absolute top-6 right-8 z-10">
@@ -342,10 +347,8 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
                     </div>
 
                     {/* Paper area */}
-                    <div className="flex-1 w-full flex justify-center pt-4 pb-24">
-                        <div className="origin-top" style={{ transform: 'scale(0.9)' }}>
-                            <ResumePreview content={previewContent} />
-                        </div>
+                    <div className="flex-1 w-full pt-4 pb-24 px-4">
+                        <ResumePreview content={previewContent} />
                     </div>
 
                     {/* Bottom Floating Action Bar */}
