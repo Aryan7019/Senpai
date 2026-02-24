@@ -48,7 +48,7 @@ export default async function InterviewSessionPage({
                             <ul className="space-y-5 text-sm text-white/70 font-medium relative z-10">
                                 <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />Local processing active</li>
                                 <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />Real-time deep analysis</li>
-                                <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />End-to-end encrypted</li>
+                                <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />Secure data transmission</li>
                             </ul>
 
                             <div className="mt-auto pt-8 relative z-10">
