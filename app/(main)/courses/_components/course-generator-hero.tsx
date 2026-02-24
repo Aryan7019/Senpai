@@ -28,41 +28,48 @@ export default function CourseGeneratorHero() {
 
             setProgress(20);
 
-            // STEP 2: Generate ALL chapters in parallel
+            // STEP 2: Generate chapters — batch 2 at a time to avoid rate limits
             const chapters = course.layout as any[];
             const chapterCount = chapters.length;
             let completedChapters = 0;
 
-            setStatusText(`Generating ${chapterCount} chapters in parallel...`);
+            setStatusText(`Generating ${chapterCount} chapters...`);
 
-            await Promise.all(
-                chapters.map(async (chapter) => {
-                    const fetchRes = await fetch('/api/generate-video-content', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            courseId: course.courseId,
-                            chapterId: chapter.chapterId,
-                            subTopics: chapter.subTopics
-                        })
-                    });
+            // Process in batches of 2 to avoid overwhelming the API
+            const batchSize = 2;
+            for (let i = 0; i < chapterCount; i += batchSize) {
+                const batch = chapters.slice(i, i + batchSize);
 
-                    if (!fetchRes.ok) {
-                        const err = await fetchRes.json();
-                        throw new Error(err.error || "Failed to generate chapter content");
-                    }
+                await Promise.all(
+                    batch.map(async (chapter) => {
+                        const fetchRes = await fetch('/api/generate-video-content', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                courseId: course.courseId,
+                                chapterId: chapter.chapterId,
+                                subTopics: chapter.subTopics
+                            })
+                        });
 
-                    completedChapters++;
-                    setStatusText(`Completed: ${chapter.chapterTitle} (${completedChapters}/${chapterCount})`);
-                    setProgress(20 + (completedChapters / chapterCount) * 80);
-                })
-            );
+                        if (!fetchRes.ok) {
+                            const err = await fetchRes.json();
+                            throw new Error(err.error || "Failed to generate chapter content");
+                        }
+
+                        completedChapters++;
+                        setStatusText(`Completed: ${chapter.chapterTitle} (${completedChapters}/${chapterCount})`);
+                        setProgress(20 + (completedChapters / chapterCount) * 80);
+                    })
+                );
+            }
 
             setStatusText("Course generated successfully!");
             setProgress(100);
 
-            // Wait a sec for the user to see 100%, then redirect to preview
+            // Refresh the page data (server component re-fetches) then redirect
             setTimeout(() => {
+                router.refresh(); // Re-fetches server component data
                 router.push(`/courses/${courseId}/preview`);
             }, 1000);
 

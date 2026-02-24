@@ -19,11 +19,11 @@ import dynamic from 'next/dynamic'
 
 // Dynamically import MDEditor to avoid SSR issues
 const MDEditor = dynamic(
-  () => import('@uiw/react-md-editor'),
-  { 
-    ssr: false,
-    loading: () => <div className="h-[800px] border rounded-lg flex items-center justify-center">Loading editor...</div>
-  }
+    () => import('@uiw/react-md-editor'),
+    {
+        ssr: false,
+        loading: () => <div className="h-[800px] border rounded-lg flex items-center justify-center">Loading editor...</div>
+    }
 )
 
 
@@ -70,7 +70,7 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
     } = useFetch(saveResume)
 
     const formValues = watch()
-    
+
     useEffect(() => {
         // If there's saved content and no form data, show preview tab
         if (initialContent && !initialFormData) {
@@ -108,7 +108,7 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
             toast.success("Resume saved successfully!");
         }
         if (saveError) {
-            toast.error( "Failed to save resume");
+            toast.error("Failed to save resume");
         }
     }, [saveResult, saveError, isSaving]);
     const getContactMarkdown = () => {
@@ -145,10 +145,10 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
     const onSubmit = async () => {
         try {
             const content = activeTab === "edit" ? getCombinedContent() : previewContent;
-            
+
             console.log("Saving resume with content length:", content.length);
             console.log("Form data:", formValues);
-            
+
             // Save both content and form data
             await saveResumeFn(content, formValues);
         } catch (error: any) {
@@ -169,7 +169,7 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
             const html2canvas = (await import("html2canvas")).default;
             // @ts-ignore - Dynamic import types
             const jsPDF = (await import("jspdf")).jsPDF;
-            
+
             // Create an isolated iframe to render the markdown without CSS conflicts
             const iframe = document.createElement('iframe');
             iframe.style.position = 'absolute';
@@ -178,10 +178,10 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
             iframe.style.width = '794px';
             iframe.style.height = '1123px';
             document.body.appendChild(iframe);
-            
+
             const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
             if (!iframeDoc) throw new Error("Could not access iframe document");
-            
+
             // Write clean HTML with inline styles to the iframe
             iframeDoc.open();
             iframeDoc.write(`
@@ -319,17 +319,17 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
                 </html>
             `);
             iframeDoc.close();
-            
+
             // Wait for iframe to load
             await new Promise(resolve => {
                 iframe.onload = resolve;
                 if (iframe.contentDocument?.readyState === 'complete') resolve(null);
             });
-            
+
             // Convert markdown to HTML and insert into iframe
             const { marked } = await import('marked');
             let htmlContent = await marked(previewContent);
-            
+
             // Post-process the HTML to improve formatting
             htmlContent = htmlContent
                 // Fix contact info centering
@@ -338,12 +338,12 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
                 .replace(/<a href="([^"]*)"[^>]*>([^<]*)<\/a>/g, '<a href="$1" target="_blank">$2</a>')
                 // Add emoji styling
                 .replace(/(📧|📱|🔗)/g, '<span class="emoji">$1</span>');
-            
+
             const contentDiv = iframeDoc.getElementById('resume-content');
             if (contentDiv) {
                 //@ts-ignore
                 contentDiv.innerHTML = htmlContent;
-                
+
                 // Additional DOM manipulation for better structure
                 const headings = contentDiv.querySelectorAll('h2');
                 headings.forEach((heading: any) => {
@@ -356,7 +356,7 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
                         heading.style.margin = '0 0 8px 0';
                     }
                 });
-                
+
                 // Style contact info paragraphs
                 const paragraphs = contentDiv.querySelectorAll('p');
                 paragraphs.forEach((p: any) => {
@@ -365,27 +365,27 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
                     }
                 });
             }
-            
+
             // Wait a bit for rendering
             await new Promise(resolve => setTimeout(resolve, 500));
-            
+
             // Capture the iframe content
             const canvas = await html2canvas(iframeDoc.body, {
                 useCORS: true,
                 allowTaint: true,
-                  //@ts-ignore
+                //@ts-ignore
                 backgroundColor: '#ffffff',
                 width: 794,
                 height: 1123
             });
-            
+
             // Remove iframe
             document.body.removeChild(iframe);
-            
+
             // Generate PDF
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF('portrait', 'mm', 'a4');
-            
+
             const pdfWidth = pdf.internal.pageSize.getWidth();
             const pdfHeight = pdf.internal.pageSize.getHeight();
             const imgWidth = canvas.width;
@@ -393,10 +393,10 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
             const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
             const imgX = (pdfWidth - imgWidth * ratio) / 2;
             const imgY = 10;
-            
+
             pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
             pdf.save('resume.pdf');
-            
+
             toast.success("PDF generated successfully!");
         } catch (error) {
             console.error("PDF generation error:", error);
@@ -409,66 +409,55 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
     // Show loading state during SSR
     if (!isMounted) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
+            <div className="flex items-center justify-center min-h-[60vh]">
                 <div className="text-center">
-                    <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-                    <p>Loading Resume Builder...</p>
+                    <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+                    <p className="text-white/50 font-medium">Loading Resume Builder...</p>
                 </div>
             </div>
         )
     }
 
     return (
-        <div>
-            <div className='flex flex-col md:flex-row justify-between items-center gap-2'>
-                <h1 className='font-bold gradient-title text-5xl md:text-6xl'>Resume Builder</h1>
-                <div className='space-x-2'>
-                    <Button variant={"destructive"} onClick={onSubmit} disabled={isSaving}>
+        <div className="space-y-8">
+            {/* Header */}
+            <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
+                <div className="space-y-2">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-md shadow-[0_0_15px_-3px_var(--color-primary)] text-primary uppercase tracking-[0.2em] text-[10px] font-black">
+                        <Edit className="w-3 h-3" /> Resume Builder
+                    </div>
+                    <h1 className='font-black text-4xl md:text-5xl tracking-tight text-white'>Build Your <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/80 to-primary/40">Perfect Resume</span></h1>
+                </div>
+                <div className='flex gap-3'>
+                    <Button onClick={onSubmit} disabled={isSaving} className="bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 backdrop-blur-sm shadow-[0_0_15px_-5px_var(--color-primary)] font-bold">
                         {isSaving ? (
-                            <>
-                                <Loader2 className='h-4 w-4 animate-spin' />
-                                Saving...
-                            </>
-
+                            <><Loader2 className='h-4 w-4 animate-spin' /> Saving...</>
                         ) : (
-                            <>
-                                <Save className='h-4 w-4' />
-                                Save
-                            </>
-
+                            <><Save className='h-4 w-4' /> Save</>
                         )}
                     </Button>
-                    <Button onClick={generatePDF} disabled={isGenerating} >
+                    <Button onClick={generatePDF} disabled={isGenerating} className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-[0_0_20px_-5px_var(--color-primary)]">
                         {isGenerating ? (
-                            <>
-                                <Loader2 className='h-4 w-4 animate-spin' />
-                                Generating PDF...
-                            </>
-
+                            <><Loader2 className='h-4 w-4 animate-spin' /> Generating PDF...</>
                         ) : (
-                            <>
-                                <Download className='h-4 w-4' />
-                                Download
-                            </>
-
+                            <><Download className='h-4 w-4' /> Download PDF</>
                         )}
-
                     </Button>
                 </div>
             </div>
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList>
-                    <TabsTrigger value="edit">Form</TabsTrigger>
-                    <TabsTrigger value="preview">Markdown</TabsTrigger>
+                <TabsList className="bg-[#0a0a0a]/80 border border-white/10 rounded-xl p-1">
+                    <TabsTrigger value="edit" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:border-primary/30 rounded-lg border border-transparent font-bold">Form</TabsTrigger>
+                    <TabsTrigger value="preview" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:border-primary/30 rounded-lg border border-transparent font-bold">Markdown</TabsTrigger>
                 </TabsList>
                 <TabsContent value="edit">
-                    <form action="" className='space-y-8' >
-                        {/* conatctInfoo */}
-                        <div className='space-y-8'>
-                            <h3 className='text-lg font-medium'>
-                                Contact Information
+                    <form action="" className='space-y-8 mt-6' >
+                        {/* Contact Info */}
+                        <div className='space-y-4'>
+                            <h3 className='text-lg font-bold text-white/90 tracking-tight flex items-center gap-2'>
+                                <div className="w-1.5 h-5 rounded-full bg-primary" /> Contact Information
                             </h3>
-                            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg bg-muted/50'>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 p-5 border border-white/5 rounded-2xl bg-[#0a0a0a]/60 backdrop-blur-xl'>
                                 <div className='space-y-2'>
                                     <Label className='text-sm font-medium'>Email</Label>
                                     <Input
@@ -542,8 +531,8 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
                         {/* ProfessionalSummary */}
 
                         <div className='space-y-4'>
-                            <h3 className='text-lg font-medium'>
-                                Professional Summary
+                            <h3 className='text-lg font-bold text-white/90 tracking-tight flex items-center gap-2'>
+                                <div className="w-1.5 h-5 rounded-full bg-primary" /> Professional Summary
                             </h3>
                             <Controller
                                 name='summary'
@@ -564,8 +553,8 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
                         </div>
                         {/* skills */}
                         <div className='space-y-4'>
-                            <h3 className='text-lg font-medium'>
-                                Skills
+                            <h3 className='text-lg font-bold text-white/90 tracking-tight flex items-center gap-2'>
+                                <div className="w-1.5 h-5 rounded-full bg-primary" /> Skills
                             </h3>
                             <Controller
                                 name='skills'
@@ -586,8 +575,8 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
                         </div>
                         {/* experience */}
                         <div className='space-y-4'>
-                            <h3 className='text-lg font-medium'>
-                                Work Experience
+                            <h3 className='text-lg font-bold text-white/90 tracking-tight flex items-center gap-2'>
+                                <div className="w-1.5 h-5 rounded-full bg-primary" /> Work Experience
                             </h3>
                             <Controller
                                 name='experience'
@@ -606,8 +595,8 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
                         </div>
                         {/* education */}
                         <div className='space-y-4'>
-                            <h3 className='text-lg font-medium'>
-                                Education
+                            <h3 className='text-lg font-bold text-white/90 tracking-tight flex items-center gap-2'>
+                                <div className="w-1.5 h-5 rounded-full bg-primary" /> Education
                             </h3>
                             <Controller
                                 name='education'
@@ -627,8 +616,8 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
                         </div>
                         {/* PROJECTS */}
                         <div className='space-y-4'>
-                            <h3 className='text-lg font-medium'>
-                                Projects
+                            <h3 className='text-lg font-bold text-white/90 tracking-tight flex items-center gap-2'>
+                                <div className="w-1.5 h-5 rounded-full bg-primary" /> Projects
                             </h3>
                             <Controller
                                 name='projects'
@@ -649,27 +638,22 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
 
                     </form>
                 </TabsContent>
-                <TabsContent value="preview">
-                    <Button onClick={() => setResumeMode(resumeMode === "preview" ? "edit" : "preview")} variant={"link"} type="button" className='mb-2'>
+                <TabsContent value="preview" className="mt-6">
+                    <Button onClick={() => setResumeMode(resumeMode === "preview" ? "edit" : "preview")} variant={"ghost"} type="button" className='mb-4 text-primary hover:text-primary/80 hover:bg-primary/10 font-bold'>
                         {resumeMode === "preview" ? (
-                            <><Edit className='h-4 w-4' />
-                                Edit Resume</>
-
+                            <><Edit className='h-4 w-4' /> Edit Resume</>
                         ) : (
-                            <><Monitor className='h-4 w-4' />
-                                Show Preview</>
+                            <><Monitor className='h-4 w-4' /> Show Preview</>
                         )}
-
-
                     </Button>
                     {resumeMode !== "preview" && (
-                        <div className='flex p-3 gap-2 items-center border-2 border-yellow-600 text-yellow-600 rounded mb-2'>
-                            <AlertTriangle className='h-5 w-5' />
-                            <span className='text-sm'>You will lose editorial markdown if you update the form data.</span>
+                        <div className='flex p-4 gap-3 items-center border border-yellow-600/30 bg-yellow-600/10 text-yellow-500 rounded-xl mb-4 backdrop-blur-sm'>
+                            <AlertTriangle className='h-5 w-5 shrink-0' />
+                            <span className='text-sm font-medium'>You will lose editorial markdown if you update the form data.</span>
                         </div>
                     )}
 
-                    <div className='border rounded-lg'>
+                    <div className='border border-white/10 rounded-2xl overflow-hidden'>
                         <MDEditor
                             value={previewContent}
                             onChange={setPreviewContent}
@@ -677,7 +661,6 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
                             //@ts-ignore
                             preview={resumeMode}
                         />
-
                     </div>
                 </TabsContent>
             </Tabs>
