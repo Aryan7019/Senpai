@@ -3,7 +3,6 @@
 import React, { useMemo, useRef, useCallback, useState } from 'react';
 import { Player, PlayerRef } from '@remotion/player';
 import CourseComposition from './course-composition';
-import { Layers } from 'lucide-react';
 
 interface SlideWithTiming {
     id: string;
@@ -63,7 +62,7 @@ export default function CoursePlayerWrapper({ slides, chapters }: { slides: any[
             {/* Video Player */}
             <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-br from-primary/30 to-purple-600/30 rounded-3xl blur-xl opacity-50 group-hover:opacity-100 transition duration-1000 -z-10" />
-                <div className="w-full aspect-video bg-black rounded-3xl border border-white/10 overflow-hidden shadow-2xl relative">
+                <div className="w-full aspect-video bg-black rounded-3xl border border-white/10 overflow-hidden shadow-2xl relative video-player-container">
                     <Player
                         ref={playerRef}
                         component={CourseComposition}
@@ -78,22 +77,64 @@ export default function CoursePlayerWrapper({ slides, chapters }: { slides: any[
                         loop
                         playbackRate={playbackSpeed}
                     />
+                    {/* Playback Speed Control */}
+                    <div className="playback-speed-controls">
+                        {[1, 1.5, 2].map((speed) => (
+                            <button
+                                key={speed}
+                                onClick={() => setPlaybackSpeed(speed)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${playbackSpeed === speed
+                                    ? 'bg-primary/20 text-primary shadow-[0_0_10px_-3px_var(--color-primary)]'
+                                    : 'text-white/50 hover:text-white/80 hover:bg-white/5'
+                                    }`}
+                            >
+                                {speed}x
+                            </button>
+                        ))}
+                    </div>
                 </div>
-                {/* Playback Speed Control */}
-                <div className="absolute top-4 right-4 z-20 flex items-center gap-1 bg-black/70 backdrop-blur-md border border-white/10 rounded-xl p-1">
-                    {[1, 1.5, 2].map((speed) => (
-                        <button
-                            key={speed}
-                            onClick={() => setPlaybackSpeed(speed)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${playbackSpeed === speed
-                                ? 'bg-primary/20 text-primary shadow-[0_0_10px_-3px_var(--color-primary)]'
-                                : 'text-white/50 hover:text-white/80 hover:bg-white/5'
-                                }`}
-                        >
-                            {speed}x
-                        </button>
-                    ))}
-                </div>
+                <style jsx>{`
+                    .video-player-container {
+                        position: relative;
+                    }
+                    .playback-speed-controls {
+                        position: absolute;
+                        top: 16px;
+                        right: 16px;
+                        z-index: 2147483647;
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                        background: rgba(0, 0, 0, 0.7);
+                        backdrop-filter: blur(12px);
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        border-radius: 12px;
+                        padding: 4px;
+                        transition: opacity 0.3s ease;
+                        pointer-events: auto;
+                    }
+                    .video-player-container:not(:hover) .playback-speed-controls {
+                        opacity: 0;
+                        pointer-events: none;
+                    }
+                    .video-player-container:hover .playback-speed-controls {
+                        opacity: 1;
+                        pointer-events: auto;
+                    }
+                    /* Fullscreen support */
+                    :global(.video-player-container:fullscreen) .playback-speed-controls,
+                    :global(.video-player-container:-webkit-full-screen) .playback-speed-controls,
+                    :global(.video-player-container:-moz-full-screen) .playback-speed-controls {
+                        opacity: 1;
+                        pointer-events: auto;
+                    }
+                    :global(.video-player-container:fullscreen:not(:hover)) .playback-speed-controls,
+                    :global(.video-player-container:-webkit-full-screen:not(:hover)) .playback-speed-controls,
+                    :global(.video-player-container:-moz-full-screen:not(:hover)) .playback-speed-controls {
+                        opacity: 0;
+                        pointer-events: none;
+                    }
+                `}</style>
             </div>
 
             {/* Chapter Navigator */}

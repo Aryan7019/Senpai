@@ -136,8 +136,6 @@ function SlideRenderer({ slide, slideNumber, totalSlides }: { slide: any; slideN
                 display: 'flex',
                 gap: '50px',
                 flex: 1,
-                maxHeight: hasCaptions ? '420px' : '550px',
-                overflow: 'hidden',
                 position: 'relative',
                 zIndex: 2,
             }}>
@@ -195,7 +193,6 @@ function SlideRenderer({ slide, slideNumber, totalSlides }: { slide: any; slideN
                         fontSize: '24px',
                         lineHeight: 1.7,
                         color: 'rgba(200,220,255,0.9)',
-                        overflow: 'hidden',
                         position: 'relative',
                         opacity: interpolate(frame, [20, 35], [0, 1], { extrapolateRight: 'clamp' }),
                         transform: `translateX(${interpolate(frame, [20, 35], [40, 0], { extrapolateRight: 'clamp' })}px)`,
