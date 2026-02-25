@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useRef, useCallback } from 'react';
+import React, { useMemo, useRef, useCallback, useState } from 'react';
 import { Player, PlayerRef } from '@remotion/player';
 import CourseComposition from './course-composition';
 import { Layers } from 'lucide-react';
@@ -17,6 +17,7 @@ interface SlideWithTiming {
 export default function CoursePlayerWrapper({ slides, chapters }: { slides: any[]; chapters: { chapterId: string; title: string; slides: any[] }[] }) {
     const playerRef = useRef<PlayerRef>(null);
     const fps = 30;
+    const [playbackSpeed, setPlaybackSpeed] = useState(1);
 
     const slideTimings = useMemo(() => {
         let currentStartFrame = 0;
@@ -75,7 +76,23 @@ export default function CoursePlayerWrapper({ slides, chapters }: { slides: any[
                         controls
                         autoPlay
                         loop
+                        playbackRate={playbackSpeed}
                     />
+                </div>
+                {/* Playback Speed Control */}
+                <div className="absolute top-4 right-4 z-20 flex items-center gap-1 bg-black/70 backdrop-blur-md border border-white/10 rounded-xl p-1">
+                    {[1, 1.5, 2].map((speed) => (
+                        <button
+                            key={speed}
+                            onClick={() => setPlaybackSpeed(speed)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${playbackSpeed === speed
+                                ? 'bg-primary/20 text-primary shadow-[0_0_10px_-3px_var(--color-primary)]'
+                                : 'text-white/50 hover:text-white/80 hover:bg-white/5'
+                                }`}
+                        >
+                            {speed}x
+                        </button>
+                    ))}
                 </div>
             </div>
 
