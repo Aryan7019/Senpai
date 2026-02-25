@@ -5,7 +5,7 @@ const ResumePage = async () => {
   const resume = await getResume()
 
   return (
-    <div className="min-h-screen">
+    <div className="w-full">
       <ResumeBuilder
         initialContent={resume?.content}
         initialFormData={resume?.formData}

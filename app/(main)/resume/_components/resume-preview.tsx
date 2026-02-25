@@ -23,9 +23,21 @@ export default function ResumePreview({ content }: { content: string }) {
   useEffect(() => {
     const updateScale = () => {
       if (containerRef.current) {
-        const containerWidth = containerRef.current.clientWidth;
+        const parent = containerRef.current.parentElement;
+        if (!parent) return;
+
+        const style = window.getComputedStyle(parent);
+        const paddingX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+
+        const containerWidth = parent.clientWidth - paddingX;
+
         const paperWidth = 794; // 210mm in px
-        setScale(Math.min(1, containerWidth / paperWidth));
+
+        const scaleWidth = containerWidth / paperWidth;
+
+        // Scale down ONLY by width so it fits the screen horizontally.
+        // Let it overflow vertically so the user can scroll a larger, readable page.
+        setScale(Math.min(1, scaleWidth));
       }
     };
     updateScale();

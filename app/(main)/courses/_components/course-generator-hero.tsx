@@ -82,7 +82,7 @@ export default function CourseGeneratorHero() {
                 <Sparkles className="w-3 h-3" /> AI Course Architect
             </div>
 
-            <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-white leading-tight">
+            <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white leading-tight">
                 Turn any topic into an <br className="hidden md:block" />
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/80 to-primary/40 drop-shadow-sm">
                     Interactive Video Course
@@ -113,7 +113,6 @@ export default function CourseGeneratorHero() {
 
                     {/* Topic input */}
                     <div className="relative group">
-                        <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 to-primary/10 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
                         <div className="relative flex items-center bg-[#050505]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-2 shadow-2xl">
                             <Input
                                 placeholder="e.g. Advanced Python Concurrency..."

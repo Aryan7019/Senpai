@@ -17,8 +17,6 @@ const VoiceInterviewFlow = ({ children }: { children?: React.ReactNode }) => {
 
     return (
         <div className="max-w-4xl mx-auto relative mt-20 lg:mt-28">
-            {/* Elevated Golden Orb matching home page but shifted upwards and made more intense */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[40%] w-[600px] h-[600px] md:w-[900px] md:h-[900px] bg-primary/25 rounded-full blur-[120px] pointer-events-none -z-10 animate-in fade-in duration-1000" />
 
             {/* Main Container */}
             <div className="relative overflow-hidden bg-[#050505]/60 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-[0_0_80px_-15px_rgba(var(--color-primary),0.2)] transition-all duration-700 hover:shadow-[0_0_100px_-15px_rgba(var(--color-primary),0.3)] hover:border-white/20">
@@ -26,8 +24,6 @@ const VoiceInterviewFlow = ({ children }: { children?: React.ReactNode }) => {
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50" />
 
                 <div className="w-full flex flex-col items-center justify-center animate-in fade-in zoom-in-95 duration-500 relative">
-                    {/* Centered Golden Orb matching home page */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px] pointer-events-none -z-10" />
 
                     <div className="w-full max-w-2xl bg-[#111111]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-end gap-6 shadow-2xl relative z-10">
                         <div className="w-full space-y-2">

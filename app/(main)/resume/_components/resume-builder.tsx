@@ -144,67 +144,70 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
     const SectionHead = ({ id, title, count }: { id: string; title: string; count?: number }) => {
         const num = nextNum();
         return (
-            <div className="flex items-center justify-between cursor-pointer group" onClick={() => toggleSection(id)}>
-                <h2 className="text-lg font-semibold text-foreground flex items-center gap-2.5">
-                    <span className={`w-6 h-6 rounded flex items-center justify-center text-xs font-bold ${openSections[id]
-                        ? 'bg-primary/20 text-primary'
+            <div className="flex items-center justify-between cursor-pointer group py-3 px-4 rounded-xl hover:bg-white/[0.02] transition-colors" onClick={() => toggleSection(id)}>
+                <h2 className="text-sm font-bold text-foreground/90 flex items-center gap-3 uppercase tracking-wider">
+                    <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black transition-all ${openSections[id]
+                        ? 'bg-gradient-to-br from-primary/30 to-primary/10 text-primary shadow-[0_0_10px_-3px_var(--color-primary)]'
                         : 'bg-secondary border border-border text-muted-foreground'
                         }`}>
                         {num}
                     </span>
                     {title}
                     {count !== undefined && count > 0 && (
-                        <span className="text-[10px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full border border-primary/20">{count}</span>
+                        <span className="text-[10px] font-black bg-primary/10 text-primary px-2.5 py-0.5 rounded-full border border-primary/20 shadow-[0_0_8px_-3px_var(--color-primary)]">{count}</span>
                     )}
                 </h2>
                 {openSections[id]
-                    ? <ChevronDown className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                    ? <ChevronDown className="w-4 h-4 text-primary transition-colors" />
                     : <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                 }
             </div>
         );
     };
 
-    const inputCls = "w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-muted-foreground";
+    const inputCls = "w-full bg-secondary/80 border border-border/80 rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-primary/40 focus:border-primary/30 outline-none transition-all placeholder:text-muted-foreground/50";
 
     return (
-        <div className="flex flex-1">
+        <div className="flex w-full min-h-[calc(100vh-64px)] relative">
             {/* ═══════════════════════════════════════════════════ */}
             {/* LEFT PANEL: Editor — scrollable                     */}
             {/* ═══════════════════════════════════════════════════ */}
-            <section className="w-full xl:w-5/12 flex flex-col border-r border-border bg-background">
-                <div className="p-6 md:p-8 space-y-8 pb-32">
+            <section className="w-full xl:w-5/12 flex flex-col border-r border-border bg-background xl:sticky xl:top-[64px] xl:h-[calc(100vh-64px)] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                <div className="p-6 md:p-8 space-y-4 pb-32">
                     {/* Header */}
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-bold text-foreground">Resume Content</h1>
-                            <p className="text-sm text-muted-foreground mt-1">Fill in your details. Our AI will polish the rest.</p>
+                    <div className="space-y-3">
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-md shadow-[0_0_15px_-3px_var(--color-primary)] text-primary uppercase tracking-[0.2em] text-[10px] font-black">
+                            ✨ AI-Powered
                         </div>
+                        <h1 className="font-black text-3xl md:text-4xl tracking-tight text-white">
+                            Resume <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/80 to-primary/40">Builder</span>
+                        </h1>
+                        <p className="text-sm text-muted-foreground">Fill in your details. Our AI will polish the rest.</p>
                     </div>
 
                     {/* 1 — Contact Info */}
-                    <div className="space-y-4">
+                    <div className="rounded-2xl border border-border/60 bg-white/[0.02] p-1">
                         <SectionHead id="contact" title="Contact Information" />
                         {openSections.contact && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-4 pb-5 pt-2">
                                 <div>
-                                    <label className="block text-xs font-medium text-muted-foreground uppercase mb-1">Email</label>
+                                    <label className="block text-[11px] font-bold text-muted-foreground/70 uppercase tracking-wider mb-1.5">Email</label>
                                     <input {...register("contactInfo.email")} type="email" placeholder="your@email.com" className={inputCls} />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-medium text-muted-foreground uppercase mb-1">Phone</label>
+                                    <label className="block text-[11px] font-bold text-muted-foreground/70 uppercase tracking-wider mb-1.5">Phone</label>
                                     <input {...register("contactInfo.mobile")} type="tel" placeholder="+1 234 567 8900" className={inputCls} />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-medium text-muted-foreground uppercase mb-1">LinkedIn</label>
+                                    <label className="block text-[11px] font-bold text-muted-foreground/70 uppercase tracking-wider mb-1.5">LinkedIn</label>
                                     <input {...register("contactInfo.linkedin")} type="url" placeholder="linkedin.com/in/profile" className={inputCls} />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-medium text-muted-foreground uppercase mb-1">GitHub</label>
+                                    <label className="block text-[11px] font-bold text-muted-foreground/70 uppercase tracking-wider mb-1.5">GitHub</label>
                                     <input {...register("contactInfo.github")} type="url" placeholder="github.com/profile" className={inputCls} />
                                 </div>
                                 <div className="md:col-span-2">
-                                    <label className="block text-xs font-medium text-muted-foreground uppercase mb-1">Professional Summary</label>
+                                    <label className="block text-[11px] font-bold text-muted-foreground/70 uppercase tracking-wider mb-1.5">Professional Summary</label>
                                     <Controller name='summary' control={control}
                                         render={({ field }) => <textarea {...field} rows={4} placeholder='Write a compelling professional summary...' className={`${inputCls} resize-none`} />}
                                     />
@@ -213,99 +216,99 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
                         )}
                     </div>
 
-                    <hr className="border-border" />
-
                     {/* 2 — Experience */}
-                    <div className="space-y-4">
+                    <div className="rounded-2xl border border-border/60 bg-white/[0.02] p-1">
                         <SectionHead id="experience" title="Experience" count={formValues.experience?.length} />
                         {openSections.experience && (
-                            <Controller name='experience' control={control}
-                                render={({ field }) => <EntryForm type="experience" entries={field.value} onChange={field.onChange} />}
-                            />
+                            <div className="px-4 pb-5 pt-2">
+                                <Controller name='experience' control={control}
+                                    render={({ field }) => <EntryForm type="experience" entries={field.value} onChange={field.onChange} />}
+                                />
+                            </div>
                         )}
                     </div>
-
-                    <hr className="border-border" />
 
                     {/* 3 — Education */}
-                    <div className="space-y-4">
+                    <div className="rounded-2xl border border-border/60 bg-white/[0.02] p-1">
                         <SectionHead id="education" title="Education" count={formValues.education?.length} />
                         {openSections.education && (
-                            <Controller name='education' control={control}
-                                render={({ field }) => <EntryForm type="education" entries={field.value} onChange={field.onChange} />}
-                            />
+                            <div className="px-4 pb-5 pt-2">
+                                <Controller name='education' control={control}
+                                    render={({ field }) => <EntryForm type="education" entries={field.value} onChange={field.onChange} />}
+                                />
+                            </div>
                         )}
                     </div>
-
-                    <hr className="border-border" />
 
                     {/* 4 — Skills */}
-                    <div className="space-y-4">
+                    <div className="rounded-2xl border border-border/60 bg-white/[0.02] p-1">
                         <SectionHead id="skills" title="Skills" />
                         {openSections.skills && (
-                            <Controller name='skills' control={control}
-                                render={({ field }) => <textarea {...field} rows={3} placeholder='List your key skills...' className={`${inputCls} resize-none`} />}
-                            />
+                            <div className="px-4 pb-5 pt-2">
+                                <Controller name='skills' control={control}
+                                    render={({ field }) => <textarea {...field} rows={3} placeholder='List your key skills...' className={`${inputCls} resize-none`} />}
+                                />
+                            </div>
                         )}
                     </div>
-
-                    <hr className="border-border" />
 
                     {/* 5 — Projects */}
-                    <div className="space-y-4">
+                    <div className="rounded-2xl border border-border/60 bg-white/[0.02] p-1">
                         <SectionHead id="projects" title="Projects" count={formValues.projects?.length} />
                         {openSections.projects && (
-                            <Controller name='projects' control={control}
-                                render={({ field }) => <EntryForm type="projects" entries={field.value} onChange={field.onChange} />}
-                            />
+                            <div className="px-4 pb-5 pt-2">
+                                <Controller name='projects' control={control}
+                                    render={({ field }) => <EntryForm type="projects" entries={field.value} onChange={field.onChange} />}
+                                />
+                            </div>
                         )}
                     </div>
-
-                    <hr className="border-border" />
 
                     {/* 6 — Certifications */}
-                    <div className="space-y-4">
+                    <div className="rounded-2xl border border-border/60 bg-white/[0.02] p-1">
                         <SectionHead id="certifications" title="Certifications" count={formValues.certifications?.length} />
                         {openSections.certifications && (
-                            <Controller name='certifications' control={control}
-                                render={({ field }) => <CertificationForm entries={field.value || []} onChange={field.onChange} />}
-                            />
+                            <div className="px-4 pb-5 pt-2">
+                                <Controller name='certifications' control={control}
+                                    render={({ field }) => <CertificationForm entries={field.value || []} onChange={field.onChange} />}
+                                />
+                            </div>
                         )}
                     </div>
-
-                    <hr className="border-border" />
 
                     {/* 7 — Achievements */}
-                    <div className="space-y-4">
+                    <div className="rounded-2xl border border-border/60 bg-white/[0.02] p-1">
                         <SectionHead id="achievements" title="Achievements & Awards" />
                         {openSections.achievements && (
-                            <Controller name='achievements' control={control}
-                                render={({ field }) => <textarea {...field} rows={3} placeholder="Dean's List, Hackathon Winner..." className={`${inputCls} resize-none`} />}
-                            />
+                            <div className="px-4 pb-5 pt-2">
+                                <Controller name='achievements' control={control}
+                                    render={({ field }) => <textarea {...field} rows={3} placeholder="Dean's List, Hackathon Winner..." className={`${inputCls} resize-none`} />}
+                                />
+                            </div>
                         )}
                     </div>
 
-                    <hr className="border-border" />
-
                     {/* 8 — Languages */}
-                    <div className="space-y-4">
+                    <div className="rounded-2xl border border-border/60 bg-white/[0.02] p-1">
                         <SectionHead id="languages" title="Languages" />
                         {openSections.languages && (
-                            <Controller name='languages' control={control}
-                                render={({ field }) => <textarea {...field} rows={2} placeholder="English (Native), Hindi (Fluent)..." className={`${inputCls} resize-none`} />}
-                            />
+                            <div className="px-4 pb-5 pt-2">
+                                <Controller name='languages' control={control}
+                                    render={({ field }) => <textarea {...field} rows={2} placeholder="English (Native), Hindi (Fluent)..." className={`${inputCls} resize-none`} />}
+                                />
+                            </div>
                         )}
                     </div>
                 </div>
 
                 {/* Mobile bottom bar */}
-                <div className="sticky bottom-0 left-0 right-0 p-4 bg-background border-t border-border xl:hidden z-10">
+                <div className="sticky bottom-0 left-0 right-0 p-4 bg-background/90 backdrop-blur-md border-t border-border xl:hidden z-10">
                     <div className="flex gap-2">
-                        <Button onClick={() => setShowMobilePreview(true)} variant="outline" className="border-primary/30 text-primary">
+                        <Button onClick={() => setShowMobilePreview(true)} variant="outline" className="flex-1 border-primary/30 text-primary font-bold">
                             <Eye className='h-4 w-4' /> Preview
                         </Button>
-                        <Button onClick={generatePDF} disabled={isGenerating} className="flex-1 gradient text-primary-foreground font-bold">
-                            {isGenerating ? <><Loader2 className='h-4 w-4 animate-spin' /> Generating...</> : <><Download className='h-4 w-4' /> Download PDF</>}
+                        <Button onClick={onSubmit} disabled={isSaving} variant="outline" className="flex-1 border-border font-bold">
+                            {isSaving ? <><Loader2 className='h-4 w-4 animate-spin' /> Saving...</> : 'Save Draft'}
                         </Button>
                     </div>
                 </div>
@@ -313,7 +316,7 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
                 {/* Mobile preview overlay */}
                 {showMobilePreview && (
                     <div className="fixed inset-0 z-50 bg-background xl:hidden flex flex-col overflow-hidden">
-                        <div className="flex items-center justify-between p-4 border-b border-border">
+                        <div className="flex items-center justify-between p-4 border-b border-border bg-background/80 backdrop-blur-md">
                             <h2 className="font-bold text-foreground">Resume Preview</h2>
                             <div className="flex items-center gap-3">
                                 <ATSScore content={previewContent} />
@@ -322,10 +325,8 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
                                 </button>
                             </div>
                         </div>
-                        <div className="flex-1 overflow-hidden p-4 bg-secondary">
-                            <div>
-                                <ResumePreview content={previewContent} />
-                            </div>
+                        <div className="flex-1 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-4 bg-secondary flex justify-center">
+                            <ResumePreview content={previewContent} />
                         </div>
                         <div className="p-4 border-t border-border bg-background">
                             <Button onClick={() => { setShowMobilePreview(false); generatePDF(); }} disabled={isGenerating} className="w-full gradient text-primary-foreground font-bold">
@@ -339,20 +340,22 @@ const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
             {/* ═══════════════════════════════════════════════════ */}
             {/* RIGHT PANEL: Preview — fixed with dark bg           */}
             {/* ═══════════════════════════════════════════════════ */}
-            <section className="hidden xl:block flex-1 bg-secondary overflow-x-hidden">
-                <div className="sticky top-0 h-screen flex flex-col items-center p-8 relative">
-                    {/* Floating ATS Widget */}
-                    <div className="absolute top-6 right-8 z-10">
-                        <ATSScore content={previewContent} />
-                    </div>
+            <section className="hidden xl:flex flex-1 bg-secondary flex-col relative">
+                {/* Subtle grid pattern */}
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:2rem_2rem] pointer-events-none" />
+                {/* Floating ATS Widget */}
+                <div className="sticky top-[68px] self-end mr-6 z-10">
+                    <ATSScore content={previewContent} />
+                </div>
 
-                    {/* Paper area */}
-                    <div className="flex-1 w-full pt-4 pb-24 px-4">
-                        <ResumePreview content={previewContent} />
-                    </div>
+                {/* Paper area */}
+                <div className="flex-1 w-full flex justify-center px-4 -mt-4">
+                    <ResumePreview content={previewContent} />
+                </div>
 
-                    {/* Bottom Floating Action Bar */}
-                    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-1 gold-border-gradient p-2 rounded-xl shadow-2xl shadow-black/50 z-20">
+                {/* Action Bar — sits at the bottom, user scrolls to it */}
+                <div className="w-full flex justify-center py-8 px-4">
+                    <div className="flex items-center gap-2 gold-border-gradient p-2 rounded-xl shadow-2xl shadow-black/50 bg-secondary/80 backdrop-blur-md">
                         <button onClick={onSubmit} disabled={isSaving} className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-white/5 rounded-lg transition-colors disabled:opacity-50">
                             {isSaving ? 'Saving...' : 'Save Draft'}
                         </button>
