@@ -68,38 +68,7 @@ export function InterviewReportDialog({ open, onOpenChange, interview }: Intervi
                         </div>
                     </div>
 
-                    {/* Metrics Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* Technical */}
-                        <div className="p-6 bg-gradient-to-b from-[#111] to-[#0a0a0a] rounded-[2rem] border border-white/5 flex flex-col items-center text-center relative overflow-hidden group hover:border-blue-500/30 transition-colors">
-                            <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                            <div className="h-12 w-12 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center mb-4">
-                                <Target className="h-6 w-6" />
-                            </div>
-                            <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-1">Technical Skills</span>
-                            <span className="text-4xl font-black text-white">{interview.technicalScore !== null ? Math.round(interview.technicalScore) : "--"}</span>
-                        </div>
 
-                        {/* Communication */}
-                        <div className="p-6 bg-gradient-to-b from-[#111] to-[#0a0a0a] rounded-[2rem] border border-white/5 flex flex-col items-center text-center relative overflow-hidden group hover:border-purple-500/30 transition-colors">
-                            <div className="absolute inset-0 bg-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                            <div className="h-12 w-12 rounded-full bg-purple-500/10 text-purple-500 flex items-center justify-center mb-4">
-                                <MessageSquare className="h-6 w-6" />
-                            </div>
-                            <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-1">Communication</span>
-                            <span className="text-4xl font-black text-white">{interview.communicationScore !== null ? Math.round(interview.communicationScore) : "--"}</span>
-                        </div>
-
-                        {/* Confidence */}
-                        <div className="p-6 bg-gradient-to-b from-[#111] to-[#0a0a0a] rounded-[2rem] border border-white/5 flex flex-col items-center text-center relative overflow-hidden group hover:border-emerald-500/30 transition-colors">
-                            <div className="absolute inset-0 bg-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                            <div className="h-12 w-12 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-4">
-                                <ShieldCheck className="h-6 w-6" />
-                            </div>
-                            <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-1">Confidence</span>
-                            <span className="text-4xl font-black text-white">{interview.confidenceScore !== null ? Math.round(interview.confidenceScore) : "--"}</span>
-                        </div>
-                    </div>
 
                     {/* Detailed AI Feedback Box (Stacked Layout for Readability) */}
                     <div className="flex flex-col gap-6">
@@ -112,16 +81,16 @@ export function InterviewReportDialog({ open, onOpenChange, interview }: Intervi
                                 </div>
                                 <h3 className="text-xl font-bold text-white tracking-tight">Key Strengths</h3>
                             </div>
-                            <div className="space-y-3">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {Array.isArray(interview.strengths) && interview.strengths.length > 0 ? (
                                     interview.strengths.map((point: string, i: number) => (
-                                        <div key={i} className="flex items-start gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white-[0.02] hover:bg-white/[0.04] transition-colors">
-                                            <span className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0 shadow-[0_0_12px_#10b981]" />
-                                            <span className="text-[15px] text-white/80 font-medium leading-relaxed">{point}</span>
+                                        <div key={i} className="flex items-start gap-4 p-4 rounded-xl bg-white/[0.02] border border-white-[0.02] hover:bg-white/[0.04] transition-colors">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 shrink-0 shadow-[0_0_12px_#10b981]" />
+                                            <span className="text-sm text-white/70 font-medium leading-relaxed">{point}</span>
                                         </div>
                                     ))
                                 ) : (
-                                    <p className="text-sm text-white/30 italic px-4">No specific strengths recorded.</p>
+                                    <p className="text-sm text-white/30 italic px-4 col-span-2">No specific strengths recorded.</p>
                                 )}
                             </div>
                         </div>
@@ -135,16 +104,16 @@ export function InterviewReportDialog({ open, onOpenChange, interview }: Intervi
                                 </div>
                                 <h3 className="text-xl font-bold text-white tracking-tight">Areas to Improve</h3>
                             </div>
-                            <div className="space-y-3">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {Array.isArray(interview.improvements) && interview.improvements.length > 0 ? (
                                     interview.improvements.map((point: string, i: number) => (
-                                        <div key={i} className="flex items-start gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white-[0.02] hover:bg-white/[0.04] transition-colors">
-                                            <span className="w-2 h-2 rounded-full bg-red-500 mt-1.5 shrink-0 shadow-[0_0_12px_#ef4444]" />
-                                            <span className="text-[15px] text-white/80 font-medium leading-relaxed">{point}</span>
+                                        <div key={i} className="flex items-start gap-4 p-4 rounded-xl bg-white/[0.02] border border-white-[0.02] hover:bg-white/[0.04] transition-colors">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 mt-2 shrink-0 shadow-[0_0_12px_#ef4444]" />
+                                            <span className="text-sm text-white/70 font-medium leading-relaxed">{point}</span>
                                         </div>
                                     ))
                                 ) : (
-                                    <p className="text-sm text-white/30 italic px-4">No specific improvements recorded.</p>
+                                    <p className="text-sm text-white/30 italic px-4 col-span-2">No specific improvements recorded.</p>
                                 )}
                             </div>
                         </div>
@@ -158,16 +127,16 @@ export function InterviewReportDialog({ open, onOpenChange, interview }: Intervi
                                 </div>
                                 <h3 className="text-xl font-bold text-white tracking-tight">Key Takeaways</h3>
                             </div>
-                            <div className="space-y-3">
+                            <div className="rounded-xl border border-white/5 bg-white/[0.01] divide-y divide-white/5 overflow-hidden">
                                 {Array.isArray(interview.keyPoints) && interview.keyPoints.length > 0 ? (
                                     interview.keyPoints.map((point: string, i: number) => (
-                                        <div key={i} className="flex items-start gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white-[0.02] hover:bg-white/[0.04] transition-colors">
-                                            <span className="w-2 h-2 rounded-full bg-blue-500 mt-1.5 shrink-0 shadow-[0_0_12px_#3b82f6]" />
-                                            <span className="text-[15px] text-white/80 font-medium leading-relaxed">{point}</span>
+                                        <div key={i} className="p-4 text-sm text-white/70 font-medium leading-relaxed flex gap-4 hover:bg-white/[0.03] transition-colors">
+                                            <span className="text-blue-500/40 font-bold select-none shrink-0 tabular-nums">{(i + 1).toString().padStart(2, '0')}</span>
+                                            {point}
                                         </div>
                                     ))
                                 ) : (
-                                    <p className="text-sm text-white/30 italic px-4">No key takeaways generated yet.</p>
+                                    <p className="text-sm text-white/30 italic p-4">No key takeaways generated yet.</p>
                                 )}
                             </div>
                         </div>

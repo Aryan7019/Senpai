@@ -22,8 +22,24 @@ export async function analyzeVoiceInterview(
     const user = await db.user.findUnique({ where: { clerkUserId: userId } });
     if (!user) throw new Error("User not found");
 
-    if (!transcript || transcript.trim().length < 5) {
-        // If the conversation was too short, mark it as failed or skipped
+    const userMessages = chatHistory.filter(
+        (msg) => msg.role === "user" && msg.text && msg.text.trim().length > 0
+    );
+
+    const substantiveUserMessages = userMessages.filter(
+        (msg) => msg.text.trim().split(/\s+/).length >= 3 // At least 3 words
+    );
+
+    const totalUserWordCount = userMessages.reduce(
+        (count, msg) => count + msg.text.trim().split(/\s+/).length, 0
+    );
+
+    if (
+        !transcript ||
+        transcript.trim().length < 5 ||
+        substantiveUserMessages.length < 2 ||
+        totalUserWordCount < 10
+    ) {
         const voiceInterview = await db.voiceInterview.create({
             data: {
                 userId: user.id,
@@ -32,38 +48,88 @@ export async function analyzeVoiceInterview(
                 transcript: transcript || "No transcript collected.",
                 chatHistory: chatHistory as unknown as Prisma.InputJsonValue[],
                 status: "FAILED",
-                detailedFeedback: "The interview was too short to generate meaningful feedback."
+                technicalScore: 0,
+                communicationScore: 0,
+                confidenceScore: 0,
+                strengths: ["No substantive responses were provided by the candidate."],
+                improvements: ["Engage with the interviewer and provide detailed answers to questions."],
+                keyPoints: ["The candidate did not participate meaningfully in the interview."],
+                detailedFeedback:
+                    "The interview session ended without enough participation from the candidate. " +
+                    "You need to answer the interviewer's questions with detailed, substantive responses to receive a meaningful score."
             }
         });
         return voiceInterview.id;
     }
 
+    const formattedChatHistory = chatHistory
+        .map((msg) => `[${msg.role === "assistant" ? "INTERVIEWER" : "CANDIDATE"}]: ${msg.text}`)
+        .join("\n");
+
     const prompt = `
-  You are an expert technical hiring manager evaluating an interview transcript for the role of "${targetRole}" conducted in "${language}".
-  
-  Read the transcript below carefully. You MUST return ONLY a valid, raw JSON object. Do not include markdown formatting, backticks, or any conversational text.
-  
-  The JSON object MUST EXACTLY match this structure:
-  {
-    "technicalScore": <number between 0 and 100 representing technical knowledge demonstrated>,
-    "communicationScore": <number between 0 and 100 representing clarity and professional communication>,
-    "confidenceScore": <number between 0 and 100 representing confidence and assertiveness>,
-    "strengths": ["<string: positives of the interviewee>", ... max 3],
-    "improvements": ["<string: improvements to be made>", ... max 3],
-    "keyPoints": ["<string: key points about what happened in the interview>", ... max 3]
-  }
+You are a ruthlessly honest, highly precise technical hiring manager. You are evaluating a voice interview for the role of "${targetRole}" conducted in "${language}".
 
-  IMPORTANT INSTRUCTIONS:
-  - Deeply analyze the entire transcript without bias before generating your feedback.
-  - "strengths": Focus exclusively on the positives of the interviewee based on your deep analysis.
-  - "improvements": Focus exclusively on the actionable improvements the interviewee must make.
-  - "keyPoints": Briefly summarize the most vital topics that were covered or happened in the interview.
-  - All three arrays must contain extremely concise strings (1 short sentence max each).
-  - Provide exactly 2 to 3 bullet points for each array.
+Below is the FULL CONVERSATION between the AI INTERVIEWER and the CANDIDATE. Your job is to deeply analyze the CANDIDATE's performance and calculate their scores using a strict, mathematical point system.
 
-  Transcript:
-  ${transcript}
-  `;
+═══════════════════════════════════════════
+CONVERSATION (role-tagged):
+═══════════════════════════════════════════
+${formattedChatHistory}
+
+═══════════════════════════════════════════
+RAW TRANSCRIPT (for context):
+═══════════════════════════════════════════
+${transcript}
+
+═══════════════════════════════════════════
+PRECISE SCORING INSTRUCTIONS & MATHEMATICAL RUBRIC
+═══════════════════════════════════════════
+
+You must calculate scores by starting at a baseline and applying precise additions/deductions. Evaluate ONLY the candidate's words. Do NOT score the interviewer.
+
+**1. TECHNICAL SCORE (Base: 0, Max: 100)**
+Start at 0. For each technical question asked, add points based on the candidate's answer depth:
+• +0 points: Candidate skips, stays silent, or says "I don't know".
+• +5 points per question: Candidate mentions relevant buzzwords but provides no actual explanation.
+• +10 points per question: Candidate provides a basic, surface-level textbook definition.
+• +20 points per question: Candidate explains the concept clearly with practical context.
+• +30 points per question: Candidate provides a masterful, highly detailed explanation, covering edge cases, trade-offs, or real-world architecture.
+*Deductions:*
+• -15 points: For every factually incorrect technical statement.
+• -10 points: For rambling off-topic without answering the core technical question.
+*(Cap final score to 100, minimum 0)*
+
+**2. COMMUNICATION SCORE (Base: 100, Max: 100)**
+Start at 100. Deduct points for poor communication:
+• -10 points: For every response that is extremely brief (under 5 words) when a longer explanation was needed.
+• -15 points: For responses that are highly fragmented, disorganized, or difficult to follow.
+• -5 points: For excessive filler words or rambling.
+• -40 points: If the candidate consistently fails to directly answer the question asked.
+*(If total deductions exceed 100, score is 0)*
+
+**3. CONFIDENCE SCORE (Base: 100, Max: 100)**
+Start at 100. Deduct points for lack of confidence:
+• -20 points: If the candidate explicitly expresses self-doubt ("I think maybe...", "I'm probably wrong but...").
+• -10 points: For every long pause or extreme hesitation before answering.
+• -10 points: For a constant seeking of validation from the interviewer.
+• -50 points: If the candidate gives up completely on a question.
+*(If total deductions exceed 100, score is 0)*
+
+**CRITICAL RULE FOR SHORT/EMPTY INTERVIEWS:**
+If the candidate spoke fewer than 2 substantive sentences overall, ALL THREE SCORES MUST EXACTLY EQUAL 0. No exceptions.
+
+**OUTPUT FORMAT:**
+Return ONLY a valid, raw JSON object. No markdown, no backticks, no explanation strings.
+
+{
+  "technicalScore": <calculated number 0-100>,
+  "communicationScore": <calculated number 0-100>,
+  "confidenceScore": <calculated number 0-100>,
+  "strengths": ["<1 short sentence based ONLY on candidate's words>", "<1 short sentence>"],
+  "improvements": ["<1 short, precise, actionable improvement>", "<1 short sentence>"],
+  "keyPoints": ["<1 short sentence summarizing what candidate struggled/excelled at>"]
+}
+`;
 
     try {
         console.log("Sending prompt to Gemini...");
@@ -72,7 +138,7 @@ export async function analyzeVoiceInterview(
         console.log("Raw Response from Gemini:", text);
 
         // Strip out any markdown code blocks or hidden characters that Gemini might occasionally inject
-        text = text.replace(/```json/gi, "").replace(/```/g, "").trim();
+        text = text.replace(/\`\`\`json/gi, "").replace(/\`\`\`/g, "").trim();
         console.log("Cleaned Text:", text);
 
         let metrics;
@@ -92,6 +158,13 @@ export async function analyzeVoiceInterview(
             };
         }
 
+        const techScore = typeof metrics?.technicalScore === "number" ? metrics.technicalScore : 0;
+        const commScore = typeof metrics?.communicationScore === "number" ? metrics.communicationScore : 0;
+        const confScore = typeof metrics?.confidenceScore === "number" ? metrics.confidenceScore : 0;
+
+        // Clamp scores to 0-100 range as a safety net
+        const clamp = (v: number) => Math.max(0, Math.min(100, Math.round(v)));
+
         const voiceInterview = await db.voiceInterview.create({
             data: {
                 userId: user.id,
@@ -100,9 +173,9 @@ export async function analyzeVoiceInterview(
                 transcript,
                 chatHistory: chatHistory as unknown as Prisma.InputJsonValue[],
                 status: "COMPLETED",
-                technicalScore: parseFloat(metrics?.technicalScore) || 50,
-                communicationScore: parseFloat(metrics?.communicationScore) || 50,
-                confidenceScore: parseFloat(metrics?.confidenceScore) || 50,
+                technicalScore: clamp(techScore),
+                communicationScore: clamp(commScore),
+                confidenceScore: clamp(confScore),
                 strengths: Array.isArray(metrics?.strengths) ? metrics.strengths : ["Failed to generate specific strengths."],
                 improvements: Array.isArray(metrics?.improvements) ? metrics.improvements : ["Failed to generate specific improvements."],
                 keyPoints: Array.isArray(metrics?.keyPoints) ? metrics.keyPoints : ["Could not parse the AI response."],

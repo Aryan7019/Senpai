@@ -54,7 +54,9 @@ export default async function InterviewPage() {
         </div>
 
         {/* Premium Glassmorphism Voice flow */}
-        <VoiceInterviewFlow>
+        <VoiceInterviewFlow />
+
+        <div className="w-full mt-24 pt-16 border-t border-white/10">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-primary/10 text-primary">
@@ -66,7 +68,7 @@ export default async function InterviewPage() {
           </div>
 
           <InterviewsGrid interviews={interviews} />
-        </VoiceInterviewFlow>
+        </div>
       </div>
     </div>
   )
